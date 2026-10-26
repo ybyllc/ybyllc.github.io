@@ -1,0 +1,19 @@
+{
+  "name": "清醒度实验室 · PVT Daily",
+  "short_name": "PVT Daily",
+  "description": "个人睡眠与持续注意力追踪：10分钟PVT、困倦评分与历史数据导出",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0b0e18",
+  "theme_color": "#10121d",
+  "lang": "zh-CN",
+  "icons": [
+    {
+      "src": "./icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
