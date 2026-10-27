@@ -1,7 +1,7 @@
 {
   "name": "清醒度实验室 · PVT Daily",
   "short_name": "PVT Daily",
-  "description": "个人睡眠与持续注意力追踪：10分钟PVT、困倦评分与历史数据导出",
+  "description": "个人睡眠与注意力测试：2、5、10分钟PVT，单次报告、困倦评分与长期趋势",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
