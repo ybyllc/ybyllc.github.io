@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101b23">
+  <meta name="description" content="ColorCard Lab：使用24色色卡为摄像头照片生成真实的像素级颜色校正。纯浏览器离线处理，兼容GitHub Pages。">
+  <title>ColorCard Lab — 相机照片校色</title>
+  <style>
+    :root{--ink:#16242c;--muted:#66757d;--line:#e2e8e9;--blue:#157d79;--blue2:#0f6260;--bg:#f5f7f6;--white:#fff;--soft:#ebf5f2;--warn:#fff6e8;--err:#ad4335}
+    *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;line-height:1.6}
+    button,input,select{font:inherit}button{cursor:pointer}button:disabled{cursor:not-allowed;opacity:.45}a{color:var(--blue)}
+    .top{background:#101e25;color:white;position:relative;overflow:hidden}.top:after{content:"";position:absolute;inset:-200px -15% auto auto;width:650px;height:650px;border-radius:50%;background:radial-gradient(circle,#2b625a55,transparent 67%);pointer-events:none}
+    .nav,.hero,.wrap{max-width:1100px;margin:auto;padding-left:24px;padding-right:24px}.nav{height:78px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #ffffff1d;position:relative;z-index:1}.brand{display:flex;gap:12px;align-items:center;font-weight:800;letter-spacing:-.4px;font-size:18px}.brand-icon{width:37px;height:37px;border-radius:11px;display:grid;place-items:center;background:linear-gradient(145deg,#77d4b3,#2d9c9c);color:#0e2528;font-size:21px}.pill{border:1px solid #ffffff3f;border-radius:100px;padding:5px 11px;font-size:12px;color:#c1dcd7;white-space:nowrap}
+    .hero{padding-top:55px;padding-bottom:66px;position:relative;z-index:1}.eyebrow{display:inline-flex;align-items:center;gap:9px;font-size:12px;letter-spacing:2px;font-weight:700;color:#90d9c8}.dot{width:7px;height:7px;border-radius:50%;background:#90d9c8}.hero h1{font-size:clamp(34px,5vw,56px);line-height:1.2;letter-spacing:-1.8px;max-width:750px;margin:17px 0 18px}.hero p{color:#b8c8cc;max-width:700px;font-size:16px;margin:0}.hero strong{color:#f8ffff}.steps-mini{margin-top:34px;display:flex;gap:11px;flex-wrap:wrap}.steps-mini span{font-size:12px;background:#ffffff10;padding:7px 12px;border:1px solid #ffffff20;border-radius:8px;color:#d2dfdd}
+    .wrap{padding-top:30px;padding-bottom:65px}.section{background:#fff;border:1px solid var(--line);border-radius:18px;box-shadow:0 8px 36px #17323508;padding:27px;margin-bottom:19px}.section-heading{display:flex;justify-content:space-between;align-items:center;gap:15px;margin-bottom:21px}.section-title{display:flex;align-items:center;gap:11px}.num{background:var(--soft);color:var(--blue2);width:29px;height:29px;display:grid;place-items:center;border-radius:9px;font-size:13px;font-weight:800}.section h2{font-size:19px;letter-spacing:-.4px;line-height:1.3;margin:0}.help{font-size:13px;color:var(--muted)}.section p{margin:0}.upload-grid{display:grid;grid-template-columns:1fr 1fr;gap:15px}.drop{border:1.5px dashed #c9d6d7;border-radius:14px;background:#fbfdfc;min-height:193px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:15px;cursor:pointer;transition:.15s;position:relative;overflow:hidden}.drop:hover,.drop.drag{border-color:#188b80;background:#f0faf6}.drop input{position:absolute;width:1px;height:1px;opacity:0;overflow:hidden;pointer-events:none}.upload-icon{font-size:29px;color:var(--blue);line-height:1;margin-bottom:10px}.drop b{font-size:15px}.drop span{color:var(--muted);font-size:12px;margin-top:5px}.upload-preview{max-width:100%;max-height:157px;object-fit:contain;border-radius:5px;display:none;margin-bottom:7px}.drop.ready .upload-preview{display:block}.drop.ready .upload-icon{display:none}.filename{overflow:hidden;white-space:nowrap;text-overflow:ellipsis;max-width:95%;color:var(--muted);font-size:12px;margin-top:4px}.small{font-size:12px;color:var(--muted);margin-top:13px!important}
+    .settings{display:flex;align-items:center;gap:15px;flex-wrap:wrap}.settings label{font-size:13px;font-weight:700}.settings select{border:1px solid #cddcda;border-radius:9px;background:white;padding:9px 11px;color:var(--ink);max-width:100%}.workarea{display:grid;grid-template-columns:minmax(0,1fr) 244px;gap:19px;align-items:start}.canvas-panel{min-width:0;background:#17232b;border:1px solid #26343a;border-radius:11px;padding:12px;position:relative}.canvas-panel canvas{width:100%;height:auto;display:block;cursor:crosshair;touch-action:none;min-height:110px;background:#1b252b;border-radius:5px}.canvas-placeholder{color:#8fa3a8;display:grid;place-items:center;min-height:250px;text-align:center;font-size:14px}.canvas-panel.has-image .canvas-placeholder{display:none}#chartCanvas{display:none}.canvas-panel.has-image #chartCanvas{display:block}.guide{background:#f6faf9;border:1px solid #e0eeeb;padding:17px;border-radius:11px}.guide b{font-size:13px}.guide ol{padding-left:20px;font-size:13px;color:#506066;line-height:2;margin:9px 0 15px}.guide li.active{color:var(--blue);font-weight:800}.guide li.done{color:#859292;text-decoration:line-through}.btn{border:1px solid var(--line);border-radius:10px;padding:11px 16px;background:white;color:var(--ink);font-weight:700;font-size:14px;transition:.16s}.btn:hover:not(:disabled){border-color:#a5c9c3;background:#f5faf8}.btn-primary{background:var(--blue);color:white;border-color:var(--blue)}.btn-primary:hover:not(:disabled){background:var(--blue2);border-color:var(--blue2)}.btn-download{background:#122a2d;color:#fff;border-color:#122a2d}.btn-download:hover:not(:disabled){background:#1c4345;color:white}.btn-full{width:100%;display:block}.btn-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.btn-row .btn{white-space:nowrap}.guide .btn{width:100%}.chart-sub{font-size:12px;color:var(--muted);margin-top:13px!important}.swatches{display:grid;grid-template-columns:repeat(6,1fr);gap:5px;margin-top:18px}.swatch{height:26px;border-radius:4px;box-shadow:inset 0 0 0 1px #00000017}.select-row{display:flex;justify-content:space-between;align-items:center;gap:18px;flex-wrap:wrap;margin-bottom:13px}.setting-box{background:#f8faf9;border:1px solid #e3eae9;border-radius:12px;padding:17px;margin-top:16px}.flex-between{display:flex;align-items:center;justify-content:space-between;gap:15px}.range{width:100%;accent-color:var(--blue);margin-top:13px}.choice{border:1px solid #d3dedc;border-radius:9px;padding:9px 12px;background:white;color:var(--ink)}.actionline{display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin-top:21px}.actionline .btn{padding:14px 22px;font-size:15px}.status{color:var(--muted);font-size:13px}.status.error{color:var(--err)}.status.good{color:#0a756d}
+    .result-grid{display:grid;grid-template-columns:1fr 1fr;gap:15px}.result-card{min-width:0;background:#f8faf9;border:1px solid #e5eaeb;border-radius:12px;padding:11px}.result-card figcaption{font-weight:800;font-size:13px;margin-bottom:10px}.result-card img,.result-card canvas{width:100%;height:auto;max-height:420px;object-fit:contain;background:#273238;display:block;border-radius:6px}.result-btns{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}.metrics{display:flex;gap:9px;flex-wrap:wrap;margin:0 0 17px}.metric{background:#eff6f3;color:#386861;font-size:12px;border-radius:7px;padding:7px 11px}.metric strong{font-weight:800}.hidden{display:none!important}.note{padding:15px 17px;background:#fff9ed;border:1px solid #f1e3c2;border-radius:10px;color:#776245;font-size:13px;margin-top:18px}.foot{margin-top:26px;text-align:center;font-size:12px;color:#77848a}.foot a{text-decoration:none}.footerlinks{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-top:7px}
+    @media(max-width:800px){.workarea{grid-template-columns:1fr}.guide ol{display:grid;grid-template-columns:1fr 1fr;column-gap:15px}.guide .btn{max-width:220px}.hero{padding-top:40px;padding-bottom:45px}}
+    @media(max-width:620px){.nav,.hero,.wrap{padding-left:16px;padding-right:16px}.nav{height:69px}.brand{font-size:16px}.pill{font-size:11px}.section{padding:18px;border-radius:14px}.hero h1{letter-spacing:-1px}.upload-grid,.result-grid{grid-template-columns:1fr}.drop{min-height:172px}.section-heading{align-items:flex-start}.section h2{font-size:18px}.settings{width:100%}.settings select{flex:1}.guide ol{grid-template-columns:1fr}.result-card img,.result-card canvas{max-height:320px}}
+  </style>
+</head>
+<body>
+<header class="top">
+  <div class="nav"><div class="brand"><span class="brand-icon">◈</span><span>ColorCard Lab</span></div><span class="pill">本地处理 · 不上传服务器</span></div>
+  <div class="hero"><div class="eyebrow"><span class="dot"></span> CAMERA COLOR RESTORATION</div><h1>用一张色卡，<br>找回相机本来的颜色。</h1><p>基于标准 24 色卡计算颜色校正矩阵，<strong>直接修改原照片像素</strong>，不使用 AI 重绘。支持 BK7252 等廉价摄像头的 JPEG / PNG 截图。纯浏览器运行，GitHub Pages 可直接托管。</p><div class="steps-mini"><span>01 上传两张照片</span><span>02 点选色卡四角</span><span>03 下载校色结果</span></div></div>
+</header>
+<main class="wrap">
+  <section class="section" aria-labelledby="s1"><div class="section-heading"><div class="section-title"><span class="num">01</span><h2 id="s1">上传照片</h2></div><span class="help">两张照片尽量在同一光源下拍摄</span></div>
+  <div class="upload-grid">
+    <label id="chartDrop" class="drop" for="chartFile"><input id="chartFile" type="file" accept="image/*"><img class="upload-preview" id="chartPreview" alt="色卡照片预览"><span class="upload-icon">▦</span><b>上传色卡照片</b><span>包含完整 24 色块的相机实拍照</span><div id="chartName" class="filename"></div></label>
+    <label id="photoDrop" class="drop" for="photoFile"><input id="photoFile" type="file" accept="image/*"><img class="upload-preview" id="photoPreview" alt="目标照片预览"><span class="upload-icon">▣</span><b>上传待校色照片</b><span>想要修正偏色的自拍或场景照片</span><div id="photoName" class="filename"></div></label>
+  </div><p class="small">推荐使用原始 JPG / PNG，不要用聊天软件转发压缩后的图片或屏幕截图。两张照片曝光、白平衡与光照越一致，结果越可靠。</p></section>
+  <section class="section" aria-labelledby="s2"><div class="section-heading"><div class="section-title"><span class="num">02</span><h2 id="s2">定位 24 个色块</h2></div><span class="help" id="picked">尚未选择角点</span></div>
+    <div class="select-row"><div class="settings"><label for="orientation">色卡排列</label><select id="orientation"><option value="180" selected>灰阶在上方：左黑 → 右白（你的色卡）</option><option value="0">灰阶在下方：左白 → 右黑（标准）</option><option value="90">灰阶在左侧：上白 → 下黑</option><option value="270">灰阶在右侧：上黑 → 下白</option></select></div></div>
+    <div class="workarea"><div class="canvas-panel" id="canvasPanel"><div class="canvas-placeholder">先上传左侧的色卡照片<br>即可在此标注色块范围</div><canvas id="chartCanvas" aria-label="色卡图片，点击选择色块区域的四个角" role="img"></canvas></div>
+    <aside class="guide"><b>依次点击色块网格的四角</b><ol id="cornerList"><li class="active">左上角 ↖</li><li>右上角 ↗</li><li>右下角 ↘</li><li>左下角 ↙</li></ol><button type="button" class="btn" id="resetBtn">重新选取四角</button><p class="chart-sub">点击的是<strong>色块网格的外边缘</strong>，不要点黑色相框的最外沿。选好后可拖动角点微调。将自动在每个色块中心取样。</p><div class="swatches" id="swatches" aria-label="采样色块预览"></div></aside></div>
+  </section>
+  <section class="section" aria-labelledby="s3"><div class="section-heading"><div class="section-title"><span class="num">03</span><h2 id="s3">生成校色照片</h2></div></div>
+    <div class="select-row"><div class="settings"><label for="mode">校色方式</label><select id="mode"><option value="matrix" selected>3×3 颜色校正矩阵（推荐）</option><option value="neutral">只校正白平衡（更保守）</option></select></div></div>
+    <div class="setting-box"><div class="flex-between"><label for="strength" style="font-weight:700;font-size:13px">校色强度</label><b id="strengthVal">85%</b></div><input class="range" type="range" id="strength" min="0" max="100" step="5" value="85"><p class="small" style="margin-top:3px!important">100% 为完全应用计算得到的矩阵；对低质量或非标准印刷色卡，建议先从 70%～85% 开始。</p></div>
+    <div class="actionline"><button id="runBtn" class="btn btn-primary" type="button" disabled>生成校色照片 →</button><span id="status" class="status" role="status" aria-live="polite">请先上传照片并选取 4 个角点。</span></div>
+    <div class="note">注意：本工具内置的是 <strong>X-Rite / ColorChecker Classic 24</strong> 的公开 sRGB 参考值。如果手里的色卡只是普通打印仿制品，或两张照片光照不同，所得结果只是近似校色，不能当作严格的色彩计量结果。</div>
+  </section>
+  <section class="section hidden" id="resultSection" aria-labelledby="resultTitle"><div class="section-heading"><div class="section-title"><span class="num">✓</span><h2 id="resultTitle">已生成：逐像素校色结果</h2></div></div><div class="metrics" id="metrics"></div>
+    <div class="result-grid"><figure class="result-card" style="margin:0"><figcaption>校色前 · 原图</figcaption><img id="beforeImage" alt="校色前原图"></figure><figure class="result-card" style="margin:0"><figcaption>校色后 · 保留原图细节</figcaption><canvas id="afterCanvas" aria-label="校色结果"></canvas></figure></div>
+    <div class="result-btns"><button class="btn btn-download" id="downloadPng">↓ 下载 PNG</button><button class="btn" id="downloadJpg">↓ 下载 JPG</button><button class="btn" id="downloadProfile">↓ 下载校正参数 JSON</button></div><p class="small">校色按 RGB 像素计算，不改变人脸形状、场景内容或原始分辨率（过大图片可能因设备限制失败）。PNG 无二次有损压缩。</p>
+  </section>
+  <div class="foot">ColorCard Lab · 无第三方脚本、无后端、无照片上传<div class="footerlinks"><span>参考数据：<a href="https://xritephoto.com/documents/literature/en/ColorData-1p_EN.pdf" target="_blank" rel="noopener noreferrer">X-Rite ColorChecker sRGB</a></span><span>适用静态网站：GitHub Pages</span></div></div>
+</main>
+<script>
+(() => {
+  'use strict';
+  // X-Rite ColorChecker Classic 24 sRGB D65 values, standard orientation:
+  // row 1: skins/sky/etc; row 2: secondary colors; row 3: RGB-CMY; row 4: white-to-black.
+  // Source: https://xritephoto.com/documents/literature/en/ColorData-1p_EN.pdf
+  const REFERENCE = [
+    [115,82,68],[194,150,130],[98,122,157],[87,108,67],[133,128,177],[103,189,170],
+    [214,126,44],[80,91,166],[193,90,99],[94,60,108],[157,188,64],[224,163,46],
+    [56,61,150],[70,148,73],[175,54,60],[231,199,31],[187,86,149],[8,133,161],
+    [243,243,242],[200,200,200],[160,160,160],[122,122,121],[85,85,85],[52,52,52]
+  ];
+  const $ = id => document.getElementById(id);
+  const chartCanvas = $('chartCanvas');
+  const chartCtx = chartCanvas.getContext('2d', {willReadFrequently:true});
+  const chartSourceCanvas = document.createElement('canvas');
+  const sourceCtx = chartSourceCanvas.getContext('2d', {willReadFrequently:true});
+  const outputCanvas = $('afterCanvas');
+  const outputCtx = outputCanvas.getContext('2d', {willReadFrequently:true});
+  const chartState = {img:null,file:null,corners:[],dragIndex:-1};
+  const photoState = {img:null,file:null,url:null};
+  let lastProfile = null;
+  const steps = Array.from($('cornerList').querySelectorAll('li'));
+  const clamp = (v,a,b)=>Math.max(a,Math.min(b,v));
+  const srgbToLinear = v => {const x=v/255;return x<=0.04045?x/12.92:Math.pow((x+0.055)/1.055,2.4);};
+  const linearToSrgb = x => {x=clamp(x,0,1);return 255*(x<=0.0031308?12.92*x:1.055*Math.pow(x,1/2.4)-0.055);};
+  const lut = Float64Array.from({length:256},(_,i)=>srgbToLinear(i));
+  let sourcePreviewURL = null;
+  const cornerNames = ['左上角','右上角','右下角','左下角'];
+  function setStatus(msg,kind=''){const e=$('status');e.textContent=msg;e.className='status '+kind;}
+  function invalidate(){lastProfile=null;$('resultSection').classList.add('hidden');$('runBtn').disabled=!(chartState.img&&photoState.img&&chartState.corners.length===4);if(!$('runBtn').disabled)setStatus('已就绪，可以开始计算颜色矩阵。','good');}
+  function loadImage(file){return new Promise((resolve,reject)=>{const url=URL.createObjectURL(file);const im=new Image();im.onload=()=>{URL.revokeObjectURL(url);resolve(im);};im.onerror=()=>{URL.revokeObjectURL(url);reject(new Error('图片无法读取，建议转换成 JPG 或 PNG。'));};im.src=url;});}
+  async function handleUpload(type,file){if(!file)return;if(!file.type.startsWith('image/')){setStatus('请选择图片文件。','error');return;}
+    try{
+      const img=await loadImage(file);
+      if(type==='chart'){
+        chartState.img=img;chartState.file=file;chartState.corners=[];
+        const scale=Math.min(1,1800/Math.max(img.naturalWidth,img.naturalHeight));
+        chartCanvas.width=Math.round(img.naturalWidth*scale);chartCanvas.height=Math.round(img.naturalHeight*scale);
+        chartSourceCanvas.width=chartCanvas.width;chartSourceCanvas.height=chartCanvas.height;
+        sourceCtx.drawImage(img,0,0,chartSourceCanvas.width,chartSourceCanvas.height);
+        $('canvasPanel').classList.add('has-image');drawChart();updateCorners();
+      }else{
+        photoState.img=img;photoState.file=file;
+        if(sourcePreviewURL)URL.revokeObjectURL(sourcePreviewURL);
+        sourcePreviewURL=URL.createObjectURL(file);
+      }
+      const prefix=type==='chart'?'chart':'photo';
+      $(prefix+'Preview').src=type==='chart'?URL.createObjectURL(file):sourcePreviewURL;
+      $(prefix+'Name').textContent=file.name+' · '+img.naturalWidth+'×'+img.naturalHeight;
+      $(prefix+'Drop').classList.add('ready');
+      invalidate();
+    }catch(e){setStatus(e.message,'error');}
+  }
+  function setupDrop(type){const drop=$(type+'Drop'),inp=$(type+'File');inp.addEventListener('change',()=>handleUpload(type,inp.files[0]));
+    for(const evt of ['dragenter','dragover'])drop.addEventListener(evt,e=>{e.preventDefault();drop.classList.add('drag');});
+    for(const evt of ['dragleave','drop'])drop.addEventListener(evt,e=>{e.preventDefault();drop.classList.remove('drag');});
+    drop.addEventListener('drop',e=>handleUpload(type,e.dataTransfer.files[0]));
+  }
+  setupDrop('chart');setupDrop('photo');
+  function drawChart(){if(!chartState.img)return;const w=chartCanvas.width,h=chartCanvas.height;chartCtx.clearRect(0,0,w,h);chartCtx.drawImage(chartSourceCanvas,0,0,w,h);
+    const p=chartState.corners;chartCtx.save();
+    if(p.length>1){chartCtx.beginPath();chartCtx.moveTo(p[0].x,p[0].y);for(let i=1;i<p.length;i++)chartCtx.lineTo(p[i].x,p[i].y);if(p.length===4)chartCtx.closePath();chartCtx.strokeStyle='#5df4c7';chartCtx.lineWidth=Math.max(2,w/650);chartCtx.stroke();}
+    if(p.length===4){
+      const [cols,rows]=gridShape();
+      chartCtx.save();chartCtx.beginPath();chartCtx.moveTo(p[0].x,p[0].y);for(let i=1;i<4;i++)chartCtx.lineTo(p[i].x,p[i].y);chartCtx.closePath();chartCtx.clip();
+      chartCtx.strokeStyle='#f8fafb9c';chartCtx.lineWidth=Math.max(1,w/1500);
+      for(let c=1;c<cols;c++){const a=quadPoint(c/cols,0),b=quadPoint(c/cols,1);chartCtx.beginPath();chartCtx.moveTo(a.x,a.y);chartCtx.lineTo(b.x,b.y);chartCtx.stroke();}
+      for(let r=1;r<rows;r++){const a=quadPoint(0,r/rows),b=quadPoint(1,r/rows);chartCtx.beginPath();chartCtx.moveTo(a.x,a.y);chartCtx.lineTo(b.x,b.y);chartCtx.stroke();}
+      for(let r=0;r<rows;r++)for(let c=0;c<cols;c++){const center=quadPoint((c+.5)/cols,(r+.5)/rows);chartCtx.beginPath();chartCtx.arc(center.x,center.y,Math.max(2,w/300),0,2*Math.PI);chartCtx.fillStyle='#5df4c7';chartCtx.fill();}
+      chartCtx.restore();
+    }
+    const radius=Math.max(6,w/160);p.forEach((a,i)=>{chartCtx.beginPath();chartCtx.arc(a.x,a.y,radius,0,2*Math.PI);chartCtx.fillStyle='#36d6aa';chartCtx.fill();chartCtx.lineWidth=Math.max(2,w/550);chartCtx.strokeStyle='#062f31';chartCtx.stroke();chartCtx.fillStyle='#052b2c';chartCtx.font=`bold ${Math.max(10,w/90)}px sans-serif`;chartCtx.textAlign='center';chartCtx.textBaseline='middle';chartCtx.fillText(String(i+1),a.x,a.y+0.5);});chartCtx.restore();
+  }
+  function updateCorners(){const n=chartState.corners.length;$('picked').textContent=n===4?'四角已确定 · 可拖动调整':`已选取 ${n}/4 个角点`;
+    steps.forEach((el,i)=>{el.className=i<n?'done':(i===n?'active':'');el.textContent=cornerNames[i]+([' ↖',' ↗',' ↘',' ↙'][i]);});
+    drawSwatches();invalidate();
+  }
+  function canvasPoint(e){const b=chartCanvas.getBoundingClientRect();return {x:clamp((e.clientX-b.left)/b.width*chartCanvas.width,0,chartCanvas.width-1),y:clamp((e.clientY-b.top)/b.height*chartCanvas.height,0,chartCanvas.height-1)};}
+  chartCanvas.addEventListener('pointerdown',e=>{if(!chartState.img)return;e.preventDefault();let a=canvasPoint(e);
+    if(chartState.corners.length===4){const threshold=Math.max(20,chartCanvas.width*0.035);let index=-1,nearest=Infinity;chartState.corners.forEach((v,i)=>{const d=Math.hypot(v.x-a.x,v.y-a.y);if(d<threshold&&d<nearest){nearest=d;index=i;}});if(index>=0){chartState.dragIndex=index;chartCanvas.setPointerCapture(e.pointerId);return;}return;}
+    chartState.corners.push(a);if(chartState.corners.length===4)chartCanvas.setPointerCapture(e.pointerId);updateCorners();drawChart();
+  });
+  chartCanvas.addEventListener('pointermove',e=>{if(chartState.dragIndex<0)return;chartState.corners[chartState.dragIndex]=canvasPoint(e);drawChart();});
+  chartCanvas.addEventListener('pointerup',()=>{if(chartState.dragIndex>=0){chartState.dragIndex=-1;updateCorners();}});
+  chartCanvas.addEventListener('pointercancel',()=>{if(chartState.dragIndex>=0){chartState.dragIndex=-1;updateCorners();}});
+  $('resetBtn').addEventListener('click',()=>{chartState.corners=[];updateCorners();drawChart();});
+  $('orientation').addEventListener('change',()=>{drawChart();drawSwatches();invalidate();});
+  $('mode').addEventListener('change',invalidate);
+  $('strength').addEventListener('input',()=>{$('strengthVal').textContent=$('strength').value+'%';invalidate();});
+  function gridShape(){const a=Number($('orientation').value);return a===90||a===270?[4,6]:[6,4];}
+  // Perspective mapping by a unit-square -> quadrilateral projective homography.
+  function quadPoint(u,v){const [tl,tr,br,bl]=chartState.corners;if(!bl)return{x:0,y:0};
+    const dx1=tr.x-br.x,dy1=tr.y-br.y,dx2=bl.x-br.x,dy2=bl.y-br.y,dx3=tl.x-tr.x+br.x-bl.x,dy3=tl.y-tr.y+br.y-bl.y;
+    const den=dx1*dy2-dx2*dy1;
+    let g=0,h=0;if(Math.abs(den)>1e-6){g=(dx3*dy2-dx2*dy3)/den;h=(dx1*dy3-dx3*dy1)/den;}
+    const a=tr.x-tl.x+g*tr.x,b=bl.x-tl.x+h*bl.x,c=tl.x,d=tr.y-tl.y+g*tr.y,e=bl.y-tl.y+h*bl.y,f=tl.y;
+    const z=g*u+h*v+1;
+    return{x:(a*u+b*v+c)/z,y:(d*u+e*v+f)/z};
+  }
+  function displayToCanonical(row,col){const angle=Number($('orientation').value);
+    if(angle===0)return row*6+col;
+    if(angle===180)return (3-row)*6+(5-col);
+    if(angle===90)return (3-col)*6+row;
+    return col*6+(5-row);
+  }
+  function readPatches(){if(chartState.corners.length!==4)throw Error('请先选取色卡的四个角点。');
+    const [cols,rows]=gridShape();const img=sourceCtx.getImageData(0,0,chartSourceCanvas.width,chartSourceCanvas.height);const data=img.data,w=img.width,h=img.height;
+    const measurements=new Array(24);
+    for(let row=0;row<rows;row++)for(let col=0;col<cols;col++){
+      const colors=[[],[],[]];let outOfBounds=0;
+      for(let iy=0;iy<7;iy++)for(let ix=0;ix<7;ix++){
+        const u=(col+0.30+ix*(0.40/6))/cols,v=(row+0.30+iy*(0.40/6))/rows;
+        const q=quadPoint(u,v),x=Math.round(q.x),y=Math.round(q.y);
+        if(x<0||x>=w||y<0||y>=h){outOfBounds++;continue;}
+        const k=(y*w+x)*4;for(let d=0;d<3;d++)colors[d].push(data[k+d]);
+      }
+      if(colors[0].length<35||outOfBounds>12)throw Error('色卡角点超出图片边界，请重新选择。');
+      measurements[displayToCanonical(row,col)]=colors.map(v=>{v.sort((a,b)=>a-b);return v[Math.floor(v.length/2)];});
+    }
+    return measurements;
+  }
+  function drawSwatches(){const root=$('swatches');root.replaceChildren();if(chartState.corners.length!==4)return;
+    try{const patches=readPatches();for(const p of patches){const e=document.createElement('span');e.className='swatch';e.style.background=`rgb(${p.map(Math.round).join(',')})`;root.appendChild(e);}}catch(_){/* invalid selection */}
+  }
+  function solve3(A,b){const n=A.length;const m=A.map((row,i)=>[...row,b[i]]);
+    for(let i=0;i<n;i++){let k=i;for(let r=i+1;r<n;r++)if(Math.abs(m[r][i])>Math.abs(m[k][i]))k=r;
+      if(Math.abs(m[k][i])<1e-11)throw Error('颜色矩阵无法求解，请调整色卡角点。');[m[i],m[k]]=[m[k],m[i]];
+      const d=m[i][i];for(let c=i;c<=n;c++)m[i][c]/=d;
+      for(let r=0;r<n;r++)if(r!==i){const v=m[r][i];for(let c=i;c<=n;c++)m[r][c]-=v*m[i][c];}
+    }
+    return m.map(row=>row[n]);
+  }
+  function fitMatrix(patches){
+    // The camera delivers already tone-mapped sRGB. Fit linear-light 3x3 without offset,
+    // regularized to identity to protect dark detail and prevent unstable overfitting.
+    const a=[[0,0,0],[0,0,0],[0,0,0]],rhs=[[0,0,0],[0,0,0],[0,0,0]];
+    for(let k=0;k<24;k++){
+      const s=patches[k].map(srgbToLinear),t=REFERENCE[k].map(srgbToLinear);
+      const weight=k>=18?1.6:(k<2?1.35:1);
+      for(let i=0;i<3;i++)for(let j=0;j<3;j++){a[i][j]+=weight*s[i]*s[j];rhs[i][j]+=weight*s[i]*t[j];}
+    }
+    const ridge=.10;for(let i=0;i<3;i++){a[i][i]+=ridge;rhs[i][i]+=ridge;}
+    const M=[[],[],[]];for(let j=0;j<3;j++){const x=solve3(a,rhs.map(r=>r[j]));for(let i=0;i<3;i++)M[i][j]=x[i];}
+    return M;
+  }
+  function fitNeutral(patches){
+    // Estimate per-channel white balance gains from the neutral row.
+    const scale=[1,1,1],read=[0,0,0],target=[0,0,0];let weightSum=0;
+    for(let k=19;k<=22;k++){const w=k===19?2:1;weightSum+=w;for(let i=0;i<3;i++){read[i]+=w*srgbToLinear(patches[k][i]);target[i]+=w*srgbToLinear(REFERENCE[k][i]);}}
+    for(let i=0;i<3;i++){read[i]/=weightSum;target[i]/=weightSum;}
+    const sr=Math.cbrt(read[0]*read[1]*read[2]);
+    for(let i=0;i<3;i++)scale[i]=clamp(sr/Math.max(read[i],.01),.45,2.3);
+    return [[scale[0],0,0],[0,scale[1],0],[0,0,scale[2]]];
+  }
+  function predictRgb(rgb,matrix){const x=rgb.map(srgbToLinear);return [0,1,2].map(j=>linearToSrgb(x[0]*matrix[0][j]+x[1]*matrix[1][j]+x[2]*matrix[2][j]));}
+  function errorMetric(patches,matrix){let a=0,b=0;for(let i=0;i<24;i++){
+    const after=predictRgb(patches[i],matrix);for(let k=0;k<3;k++){a+=Math.pow(patches[i][k]-REFERENCE[i][k],2);b+=Math.pow(after[k]-REFERENCE[i][k],2);}}
+    return {before:Math.sqrt(a/72),after:Math.sqrt(b/72)};
+  }
+  function checkCorners(){const p=chartState.corners;let area=0;for(let i=0;i<4;i++){const a=p[i],b=p[(i+1)%4];area+=a.x*b.y-b.x*a.y;}
+    if(Math.abs(area)<chartCanvas.width*chartCanvas.height*.001)throw Error('选中的色卡区域太小，或角点顺序不正确。');
+  }
+  function downloadBlob(blob,name){const u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),10000);}
+  async function renderResult(){if(!chartState.img||!photoState.img||chartState.corners.length!==4)return;
+    const btn=$('runBtn');btn.disabled=true;setStatus('正在读取色块并计算矩阵……');
+    try{checkCorners();const patches=readPatches();
+      // Verify that selected orientation actually locates a grayscale strip.
+      let neutralDiff=0;for(let i=18;i<24;i++){const p=patches[i];neutralDiff+=Math.max(...p)-Math.min(...p);}neutralDiff/=6;
+      if(neutralDiff>55)throw Error('检测到灰阶色块 RGB 差异过大。请核对色卡排列方向和选取的四角位置。');
+      const mode=$('mode').value,mat=mode==='neutral'?fitNeutral(patches):fitMatrix(patches);
+      if(!mat.flat().every(Number.isFinite))throw Error('矩阵计算异常。');
+      const strength=Number($('strength').value)/100;const actual=mat.map((row,i)=>row.map((x,j)=>(i===j?1-strength:0)+strength*x));
+      const quality=errorMetric(patches,actual);
+      // Suppress unrealistic numerical profiles, often caused by reversed chart order.
+      if(quality.after>quality.before*1.3)throw Error('校色后色卡误差反而显著增大。请检查色卡方向和四角位置。');
+      const img=photoState.img;
+      outputCanvas.width=img.naturalWidth;outputCanvas.height=img.naturalHeight;
+      outputCtx.clearRect(0,0,outputCanvas.width,outputCanvas.height);
+      outputCtx.drawImage(img,0,0);
+      const result=outputCtx.getImageData(0,0,outputCanvas.width,outputCanvas.height);
+      const d=result.data,total=result.width*result.height;
+      setStatus('正在逐像素校色……');
+      await new Promise(resolve=>requestAnimationFrame(resolve));
+      // Process a few rows at a time to keep the page responsive.
+      let pos=0;const chunk=220000;
+      while(pos<total){const end=Math.min(pos+chunk,total);
+        for(let i=pos;i<end;i++){const k=i*4,R=lut[d[k]],G=lut[d[k+1]],B=lut[d[k+2]];
+          d[k]=linearToSrgb(R*actual[0][0]+G*actual[1][0]+B*actual[2][0]);
+          d[k+1]=linearToSrgb(R*actual[0][1]+G*actual[1][1]+B*actual[2][1]);
+          d[k+2]=linearToSrgb(R*actual[0][2]+G*actual[1][2]+B*actual[2][2]);
+        }
+        pos=end;
+        if(pos<total){setStatus(`正在处理像素…… ${Math.round(100*pos/total)}%`);await new Promise(resolve=>requestAnimationFrame(resolve));}
+      }
+      outputCtx.putImageData(result,0,0);
+      $('beforeImage').src=photoState.url||sourcePreviewURL;
+      lastProfile={tool:'ColorCard Lab',version:'1.0',reference:'X-Rite ColorChecker Classic 24 (sRGB D65)',orientation_degrees:Number($('orientation').value),mode,strength_percent:strength*100,matrix_linear_rgb_3x3:actual,full_strength_matrix_3x3:mat,sampled_rgb_patches_standard_order:patches,reference_rgb_patches_standard_order:REFERENCE,patch_rmse_srgb_0_to_255:quality,chart_file:chartState.file?.name||'',photo_file:photoState.file?.name||'',notes:'矩阵作用于线性RGB，非相机Sensor硬件寄存器值；相机光源及曝光变化会影响校色结果。'};
+      $('metrics').innerHTML=`<span class="metric"><strong>24 色块</strong>参与标定</span><span class="metric">色卡拟合 RMSE：<strong>${quality.before.toFixed(1)} → ${quality.after.toFixed(1)}</strong>（sRGB/255）</span><span class="metric"><strong>${result.width} × ${result.height}</strong> 像素</span>`;
+      $('resultSection').classList.remove('hidden');setStatus('校色完成。','good');$('resultSection').scrollIntoView({behavior:'smooth',block:'start'});
+    }catch(e){console.error(e);setStatus(e.message||'处理失败。','error');}finally{btn.disabled=!(chartState.img&&photoState.img&&chartState.corners.length===4);}
+  }
+  $('runBtn').addEventListener('click',renderResult);
+  function nameBase(){return (photoState.file?.name||'photo').replace(/\.[^.]+$/,'').replace(/[\\/:*?"<>|]/g,'_');}
+  $('downloadPng').addEventListener('click',()=>{if(!lastProfile)return;outputCanvas.toBlob(b=>{if(b)downloadBlob(b,nameBase()+'_corrected.png');},'image/png');});
+  $('downloadJpg').addEventListener('click',()=>{if(!lastProfile)return;const ctx=outputCanvas.getContext('2d');outputCanvas.toBlob(b=>{if(b)downloadBlob(b,nameBase()+'_corrected.jpg');},'image/jpeg',.95);});
+  $('downloadProfile').addEventListener('click',()=>{if(!lastProfile)return;downloadBlob(new Blob([JSON.stringify(lastProfile,null,2)],{type:'application/json'}),'colorcard_profile.json');});
+})();
+</script>
+</body>
+</html>
