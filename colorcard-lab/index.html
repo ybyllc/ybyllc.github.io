@@ -37,8 +37,8 @@
     <aside class="guide"><b>依次点击色块网格的四角</b><ol id="cornerList"><li class="active">左上角 ↖</li><li>右上角 ↗</li><li>右下角 ↘</li><li>左下角 ↙</li></ol><button type="button" class="btn" id="resetBtn">重新选取四角</button><p class="chart-sub">点击的是<strong>色块网格的外边缘</strong>，不要点黑色相框的最外沿。选好后可拖动角点微调。将自动在每个色块中心取样。</p><div class="swatches" id="swatches" aria-label="采样色块预览"></div></aside></div>
   </section>
   <section class="section" aria-labelledby="s3"><div class="section-heading"><div class="section-title"><span class="num">03</span><h2 id="s3">生成校色照片</h2></div></div>
-    <div class="select-row"><div class="settings"><label for="mode">校色方式</label><select id="mode"><option value="matrix" selected>3×3 颜色校正矩阵（推荐）</option><option value="neutral">只校正白平衡（更保守）</option></select></div></div>
-    <div class="setting-box"><div class="flex-between"><label for="strength" style="font-weight:700;font-size:13px">校色强度</label><b id="strengthVal">85%</b></div><input class="range" type="range" id="strength" min="0" max="100" step="5" value="85"><p class="small" style="margin-top:3px!important">100% 为完全应用计算得到的矩阵；对低质量或非标准印刷色卡，建议先从 70%～85% 开始。</p></div>
+    <div class="select-row"><div class="settings"><label for="mode">校色方式</label><select id="mode"><option value="matrix-safe" selected>3×3 校色 · 中性色保护（推荐）</option><option value="matrix">3×3 完整矩阵（可能偏暖）</option><option value="neutral">只校正白平衡</option></select></div></div>
+    <p class="small">“中性色保护”限制校色矩阵让输入 R=G=B 的灰色仍保持中性，适合色卡与目标照片白平衡略有差异的情况；若目标照片本来就偏色严重，可与完整矩阵模式对比。</p><div class="setting-box"><div class="flex-between"><label for="strength" style="font-weight:700;font-size:13px">校色强度</label><b id="strengthVal">85%</b></div><input class="range" type="range" id="strength" min="0" max="100" step="5" value="85"><p class="small" style="margin-top:3px!important">100% 为完全应用计算得到的矩阵；对低质量或非标准印刷色卡，建议先从 70%～85% 开始。</p></div>
     <div class="actionline"><button id="runBtn" class="btn btn-primary" type="button" disabled>生成校色照片 →</button><span id="status" class="status" role="status" aria-live="polite">请先上传照片并选取 4 个角点。</span></div>
     <div class="note">注意：本工具内置的是 <strong>X-Rite / ColorChecker Classic 24</strong> 的公开 sRGB 参考值。如果手里的色卡只是普通打印仿制品，或两张照片光照不同，所得结果只是近似校色，不能当作严格的色彩计量结果。</div>
   </section>
@@ -194,6 +194,18 @@
     const M=[[],[],[]];for(let j=0;j<3;j++){const x=solve3(a,rhs.map(r=>r[j]));for(let i=0;i<3;i++)M[i][j]=x[i];}
     return M;
   }
+  function neutralPreservingMatrix(matrix){
+    // Preserve the gray axis in linear RGB: for (r,g,b)=(v,v,v), output must be (v,v,v).
+    // The original unconstrained CCM can turn neutral gray into yellow/brown when
+    // the calibration photo has a different white point than the target photo.
+    const out=matrix.map(row=>row.slice());
+    for(let j=0;j<3;j++){
+      const colSum=matrix[0][j]+matrix[1][j]+matrix[2][j];
+      const correction=(1-colSum)/3;
+      for(let i=0;i<3;i++)out[i][j]+=correction;
+    }
+    return out;
+  }
   function fitNeutral(patches){
     // Estimate per-channel white balance gains from the neutral row.
     const scale=[1,1,1],read=[0,0,0],target=[0,0,0];let weightSum=0;
@@ -218,7 +230,7 @@
       // Verify that selected orientation actually locates a grayscale strip.
       let neutralDiff=0;for(let i=18;i<24;i++){const p=patches[i];neutralDiff+=Math.max(...p)-Math.min(...p);}neutralDiff/=6;
       if(neutralDiff>55)throw Error('检测到灰阶色块 RGB 差异过大。请核对色卡排列方向和选取的四角位置。');
-      const mode=$('mode').value,mat=mode==='neutral'?fitNeutral(patches):fitMatrix(patches);
+      const mode=$('mode').value;const baseMatrix=mode==='neutral'?fitNeutral(patches):fitMatrix(patches);const mat=mode==='matrix-safe'?neutralPreservingMatrix(baseMatrix):baseMatrix;
       if(!mat.flat().every(Number.isFinite))throw Error('矩阵计算异常。');
       const strength=Number($('strength').value)/100;const actual=mat.map((row,i)=>row.map((x,j)=>(i===j?1-strength:0)+strength*x));
       const quality=errorMetric(patches,actual);
@@ -245,7 +257,7 @@
       }
       outputCtx.putImageData(result,0,0);
       $('beforeImage').src=photoState.url||sourcePreviewURL;
-      lastProfile={tool:'ColorCard Lab',version:'1.0',reference:'X-Rite ColorChecker Classic 24 (sRGB D65)',orientation_degrees:Number($('orientation').value),mode,strength_percent:strength*100,matrix_linear_rgb_3x3:actual,full_strength_matrix_3x3:mat,sampled_rgb_patches_standard_order:patches,reference_rgb_patches_standard_order:REFERENCE,patch_rmse_srgb_0_to_255:quality,chart_file:chartState.file?.name||'',photo_file:photoState.file?.name||'',notes:'矩阵作用于线性RGB，非相机Sensor硬件寄存器值；相机光源及曝光变化会影响校色结果。'};
+      lastProfile={tool:'ColorCard Lab',version:'1.0',reference:'X-Rite ColorChecker Classic 24 (sRGB D65)',orientation_degrees:Number($('orientation').value),mode,neutral_axis_preserved:mode==='matrix-safe',strength_percent:strength*100,matrix_linear_rgb_3x3:actual,full_strength_matrix_3x3:mat,sampled_rgb_patches_standard_order:patches,reference_rgb_patches_standard_order:REFERENCE,patch_rmse_srgb_0_to_255:quality,chart_file:chartState.file?.name||'',photo_file:photoState.file?.name||'',notes:'矩阵作用于线性RGB，非相机Sensor硬件寄存器值；相机光源及曝光变化会影响校色结果。'};
       $('metrics').innerHTML=`<span class="metric"><strong>24 色块</strong>参与标定</span><span class="metric">色卡拟合 RMSE：<strong>${quality.before.toFixed(1)} → ${quality.after.toFixed(1)}</strong>（sRGB/255）</span><span class="metric"><strong>${result.width} × ${result.height}</strong> 像素</span>`;
       $('resultSection').classList.remove('hidden');setStatus('校色完成。','good');$('resultSection').scrollIntoView({behavior:'smooth',block:'start'});
     }catch(e){console.error(e);setStatus(e.message||'处理失败。','error');}finally{btn.disabled=!(chartState.img&&photoState.img&&chartState.corners.length===4);}
