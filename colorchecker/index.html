@@ -7,7 +7,7 @@
 <title>ColorLab · 24 色卡照片校色</title>
 <style>
 :root{--bg:#090e18;--panel:#121a29;--panel2:#1a2535;--line:#2c394c;--text:#ecf2fb;--muted:#99a9bf;--blue:#77b9ff;--green:#71e5b5;--red:#fa8c8c}
-*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse 80% 50% at 50% -15%,#1c3652 0%,#090e18 85%);color:var(--text);font:15px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif}button,input,select{font:inherit}button{cursor:pointer}button:disabled{cursor:not-allowed;opacity:.48}header{max-width:1180px;margin:auto;padding:48px 24px 26px}.brand{font-size:13px;letter-spacing:.16em;font-weight:800;color:var(--green);text-transform:uppercase}h1{margin:8px 0 12px;font-size:clamp(30px,5vw,49px);letter-spacing:-.04em;line-height:1.18}header p{margin:0;color:var(--muted);max-width:780px}main{max-width:1180px;margin:auto;padding:0 24px 64px}.card{border:1px solid var(--line);background:rgba(18,26,41,.92);border-radius:18px;padding:24px;box-shadow:0 10px 35px #0002;margin-bottom:20px}h2{margin:0 0 16px;font-size:21px}h3{margin:0 0 10px;font-size:16px}.num{display:inline-grid;place-items:center;width:28px;height:28px;border-radius:9px;background:#23466b;color:#c9e3ff;margin-right:9px;font-size:15px}p{margin:8px 0 14px}.hint,.small{color:var(--muted);font-size:13px}.row{display:flex;gap:16px;flex-wrap:wrap;align-items:center}.uploadgrid{display:grid;grid-template-columns:1fr 1fr;gap:20px}.uploadbox{padding:23px;border:1px dashed #53637a;border-radius:14px;background:#141e2e;min-height:160px;display:flex;flex-direction:column;align-items:flex-start;justify-content:center}.uploadbox strong{font-size:17px}.uploadbox span{font-size:13px;color:var(--muted)}.uploadbox input{display:none}.primary,.secondary,.smallbutton{border:0;border-radius:11px;padding:11px 18px;background:var(--blue);color:#061425;font-weight:750}.secondary,.smallbutton{background:#263852;color:#e6f1ff;border:1px solid #48607a}.smallbutton{padding:7px 12px;font-size:13px}.uploadbtn{display:inline-block;margin-top:12px;cursor:pointer}.toolbar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:15px 0}select{background:#1d2c40;color:#fff;padding:9px;border:1px solid #49617b;border-radius:9px;max-width:100%}.frame{position:relative;background:#06090f;border:1px solid #33465c;border-radius:13px;overflow:hidden;text-align:center}.frame canvas{display:block;width:100%;height:auto;max-height:530px;object-fit:contain;touch-action:none}.frame.empty{min-height:210px;display:grid;place-items:center;color:var(--muted)}.frame.empty canvas{display:none}.legend{display:flex;align-items:center;gap:12px;flex-wrap:wrap;color:var(--muted);font-size:12px;margin-top:9px}.legend i{display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--green);margin-right:4px}.patches{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:7px;margin-top:16px}.patch{height:43px;border-radius:7px;border:1px solid #ffffff24;display:flex;align-items:end;justify-content:flex-end;padding:4px 6px;font-size:11px;text-shadow:0 1px 3px #000b;color:#fff}.double{display:grid;grid-template-columns:1fr 1fr;gap:18px}.double .frame{min-height:180px}.double .frame canvas{max-height:460px}.options{display:flex;gap:25px;align-items:center;flex-wrap:wrap;margin:8px 0 18px}.options label{cursor:pointer}.range{display:flex;align-items:center;gap:12px}.range input{width:190px;max-width:50vw;accent-color:var(--blue)}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:16px}.stat{padding:12px;border-radius:12px;background:#19273a;border:1px solid #32435b}.stat strong{display:block;font-size:22px;letter-spacing:-.03em}.stat span{font-size:12px;color:var(--muted)}.status{border:1px solid #385871;background:#13283b;border-radius:12px;padding:10px 14px;color:#c9e6ff;font-size:13px;margin:16px 0}.status.warn{border-color:#846b3b;background:#352a1a;color:#ffe0a2}.status.ok{border-color:#2e7a61;background:#12352d;color:#a9f3d0}.footer{color:var(--muted);font-size:13px;line-height:1.8;margin-top:28px}pre{padding:16px;border-radius:10px;background:#070e19;overflow:auto;white-space:pre;font-size:12px;color:#bde0ff}details{margin-top:16px}summary{cursor:pointer;font-weight:600}.hidden{display:none!important}input[type=checkbox]{accent-color:var(--blue)}.progress{height:6px;background:#213048;border-radius:8px;overflow:hidden;display:none}.progress div{height:100%;background:var(--green);width:0%}.topchips{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}.chip{padding:5px 10px;border-radius:100px;background:#21384b;color:#c3e6fb;font-size:12px}.note{border-left:3px solid var(--green);padding-left:12px;color:#b9c7d9;font-size:13px;margin-top:14px}@media(max-width:760px){header{padding-top:28px}.uploadgrid,.double{grid-template-columns:1fr}.card{padding:16px}.stats{grid-template-columns:1fr 1fr}.double .frame{min-height:120px}}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse 80% 50% at 50% -15%,#1c3652 0%,#090e18 85%);color:var(--text);font:15px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif}button,input,select{font:inherit}button{cursor:pointer}button:disabled{cursor:not-allowed;opacity:.48}header{max-width:1180px;margin:auto;padding:48px 24px 26px}.brand{font-size:13px;letter-spacing:.16em;font-weight:800;color:var(--green);text-transform:uppercase}h1{margin:8px 0 12px;font-size:clamp(30px,5vw,49px);letter-spacing:-.04em;line-height:1.18}header p{margin:0;color:var(--muted);max-width:780px}main{max-width:1180px;margin:auto;padding:0 24px 64px}.card{border:1px solid var(--line);background:rgba(18,26,41,.92);border-radius:18px;padding:24px;box-shadow:0 10px 35px #0002;margin-bottom:20px}h2{margin:0 0 16px;font-size:21px}h3{margin:0 0 10px;font-size:16px}.num{display:inline-grid;place-items:center;width:28px;height:28px;border-radius:9px;background:#23466b;color:#c9e3ff;margin-right:9px;font-size:15px}p{margin:8px 0 14px}.hint,.small{color:var(--muted);font-size:13px}.row{display:flex;gap:16px;flex-wrap:wrap;align-items:center}.uploadgrid{display:grid;grid-template-columns:1fr 1fr;gap:20px}.uploadbox{padding:23px;border:1px dashed #53637a;border-radius:14px;background:#141e2e;min-height:160px;display:flex;flex-direction:column;align-items:flex-start;justify-content:center}.uploadbox strong{font-size:17px}.uploadbox span{font-size:13px;color:var(--muted)}.uploadbox input{display:none}.primary,.secondary,.smallbutton{border:0;border-radius:11px;padding:11px 18px;background:var(--blue);color:#061425;font-weight:750}.secondary,.smallbutton{background:#263852;color:#e6f1ff;border:1px solid #48607a}.smallbutton{padding:7px 12px;font-size:13px}.uploadbtn{display:inline-block;margin-top:12px;cursor:pointer}.toolbar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:15px 0}select{background:#1d2c40;color:#fff;padding:9px;border:1px solid #49617b;border-radius:9px;max-width:100%}.frame{position:relative;background:#06090f;border:1px solid #33465c;border-radius:13px;overflow:hidden;text-align:center}.frame canvas{display:block;width:100%;height:auto;max-height:530px;object-fit:contain;touch-action:none}.frame.empty{min-height:210px;display:grid;place-items:center;color:var(--muted)}.frame.empty canvas{display:none}.legend{display:flex;align-items:center;gap:12px;flex-wrap:wrap;color:var(--muted);font-size:12px;margin-top:9px}.legend i{display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--green);margin-right:4px}.patches{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:7px;margin-top:16px}.patch{height:43px;border-radius:7px;border:1px solid #ffffff24;display:flex;align-items:end;justify-content:flex-end;padding:4px 6px;font-size:11px;text-shadow:0 1px 3px #000b;color:#fff}.double{display:grid;grid-template-columns:1fr 1fr;gap:18px}.double .frame{min-height:180px}.double .frame canvas{max-height:460px}.options{display:flex;gap:25px;align-items:center;flex-wrap:wrap;margin:8px 0 18px}.options label{cursor:pointer}.range{display:flex;align-items:center;gap:12px}.range input{width:190px;max-width:50vw;accent-color:var(--blue)}.wb-panel{border:1px solid #36516b;background:#152538;border-radius:13px;padding:15px 17px;width:100%}.wb-panel .wb-heading{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:baseline;margin-bottom:9px}.wb-panel .wb-heading strong{font-size:15px}.wb-panel .wb-heading small{font-size:12px;color:var(--muted)}.wb-track{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.wb-track input{flex:1;min-width:155px;accent-color:#8abfff}.wb-track .edge{font-size:12px;white-space:nowrap;color:var(--muted)}.wb-track #temperatureLabel{min-width:84px;text-align:center;font-variant-numeric:tabular-nums;color:#e3efff}.wb-panel .wb-help{font-size:12px;margin:8px 0 0;color:#aebfd4}.wb-track .smallbutton{padding:5px 10px}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:16px}.stat{padding:12px;border-radius:12px;background:#19273a;border:1px solid #32435b}.stat strong{display:block;font-size:22px;letter-spacing:-.03em}.stat span{font-size:12px;color:var(--muted)}.status{border:1px solid #385871;background:#13283b;border-radius:12px;padding:10px 14px;color:#c9e6ff;font-size:13px;margin:16px 0}.status.warn{border-color:#846b3b;background:#352a1a;color:#ffe0a2}.status.ok{border-color:#2e7a61;background:#12352d;color:#a9f3d0}.footer{color:var(--muted);font-size:13px;line-height:1.8;margin-top:28px}pre{padding:16px;border-radius:10px;background:#070e19;overflow:auto;white-space:pre;font-size:12px;color:#bde0ff}details{margin-top:16px}summary{cursor:pointer;font-weight:600}.hidden{display:none!important}input[type=checkbox]{accent-color:var(--blue)}.progress{height:6px;background:#213048;border-radius:8px;overflow:hidden;display:none}.progress div{height:100%;background:var(--green);width:0%}.topchips{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}.chip{padding:5px 10px;border-radius:100px;background:#21384b;color:#c3e6fb;font-size:12px}.note{border-left:3px solid var(--green);padding-left:12px;color:#b9c7d9;font-size:13px;margin-top:14px}@media(max-width:760px){header{padding-top:28px}.uploadgrid,.double{grid-template-columns:1fr}.card{padding:16px}.stats{grid-template-columns:1fr 1fr}.double .frame{min-height:120px}}
 </style>
 </head>
 <body>
@@ -37,7 +37,14 @@
 <section class="card">
 <h2><span class="num">3</span> 生成并下载校色照片</h2>
 <div class="options">
-<div class="range"><label for="strength">校正强度</label><input id="strength" type="range" min="0" max="100" value="80"><strong id="strengthLabel">80%</strong></div>
+<div class="wb-panel">
+ <div class="wb-heading"><strong>白平衡 · 色温微调</strong><small>校色后仍偏黄？向左滑动，让画面偏冷、减少黄色。</small></div>
+ <div class="wb-track">
+ <span class="edge">❄ 偏冷 / 去黄</span><input id="temperature" aria-label="白平衡冷暖微调" type="range" min="-100" max="100" step="1" value="0"><span class="edge">偏暖 / 加黄 ☀</span>
+ <strong id="temperatureLabel">0 · 中性</strong><button id="resetTemperature" class="smallbutton" type="button">重置</button></div>
+ <p class="wb-help">−100 ～ +100，默认 0 不额外调色；拖动立即更新预览，下载也会保留同样的白平衡效果。这是后期冷暖修正，不会修改色卡求得的 AWB 标定值。</p>
+</div>
+<div class="range"><label for="strength">自动校色强度</label><input id="strength" type="range" min="0" max="100" value="80"><strong id="strengthLabel">80%</strong></div>
 <label><input id="exposure" type="checkbox"> 同时匹配色卡曝光亮度（谨慎开启）</label>
 </div>
 <div class="toolbar"><button id="runBtn" class="primary" disabled>开始校色</button><button id="jpgBtn" class="secondary" disabled>下载 JPG</button><button id="pngBtn" class="secondary" disabled>下载 PNG</button></div>
@@ -54,7 +61,7 @@
 </div>
 <details id="details" class="hidden"><summary>查看 3×3 CCM 和标定参数</summary><pre id="matrixOutput"></pre></details>
 </section>
-<div class="footer">本工具是面向已处理 JPG/PNG 照片的近似颜色匹配工具，不是 RAW 级 ISP 量产标定。对已经自动白平衡、Gamma、HDR、局部调色的图像，3×3 CCM 不可能完全逆转所有 ISP 效果；不同光源或曝光时建议重新拍色卡。浏览器会读取图片像素并假定它们已经处于 sRGB 色彩空间。<br>技术实现：中性灰估计 AWB → 近似曝光归一化 → 加权最小二乘拟合保灰轴的线性 CCM → 可调强度导出。数据完全本地处理。</div>
+<div class="footer">本工具是面向已处理 JPG/PNG 照片的近似颜色匹配工具，不是 RAW 级 ISP 量产标定。对已经自动白平衡、Gamma、HDR、局部调色的图像，3×3 CCM 不可能完全逆转所有 ISP 效果；不同光源或曝光时建议重新拍色卡。浏览器会读取图片像素并假定它们已经处于 sRGB 色彩空间。<br>技术实现：中性灰估计 AWB → 近似曝光归一化 → 加权最小二乘拟合保灰轴的线性 CCM → 独立冷暖白平衡微调 → 可调强度导出。数据完全本地处理。</div>
 </main>
 <script>
 "use strict";
@@ -239,14 +246,18 @@ function fitCalibration(){
  return {gains,exposure,ccm,error,orient,risk,ordered}
 }
 function applyMatrix(v,M){return M.map(row=>v[0]*row[0]+v[1]*row[1]+v[2]*row[2])}
-function transformPixels(imageData,model,strength,withExposure){
+function transformPixels(imageData,model,strength,withExposure,temperature=0){
  const d=imageData.data,gain=model.gains,M=model.ccm,e=withExposure?model.exposure:1,k=strength;
+ // 线性RGB中的独立冷暖微调，负值：减少红、增加蓝，正值则相反。
+ // 限制在 +/-0.7 stops，默认0完全不改变白平衡。
+ const stops=clamp(temperature,-100,100)/100*.7;
+ const warmR=Math.pow(2,stops),coolB=Math.pow(2,-stops);
  const m00=M[0][0],m01=M[0][1],m02=M[0][2],m10=M[1][0],m11=M[1][1],m12=M[1][2],m20=M[2][0],m21=M[2][1],m22=M[2][2];
  for(let j=0;j<d.length;j+=4){
   const r=LUT[d[j]],g=LUT[d[j+1]],b=LUT[d[j+2]];
   const rr=r*gain[0]*e,gg=g*e,bb=b*gain[2]*e;
   const nr=m00*rr+m01*gg+m02*bb,ng=m10*rr+m11*gg+m12*bb,nb=m20*rr+m21*gg+m22*bb;
-  d[j]=fromLinear(r*(1-k)+nr*k);d[j+1]=fromLinear(g*(1-k)+ng*k);d[j+2]=fromLinear(b*(1-k)+nb*k);
+  d[j]=fromLinear((r*(1-k)+nr*k)*warmR);d[j+1]=fromLinear(g*(1-k)+ng*k);d[j+2]=fromLinear((b*(1-k)+nb*k)*coolB);
  }
  return imageData
 }
@@ -255,10 +266,18 @@ function renderPreview(){
  const w=sceneCanvas.width,h=sceneCanvas.height;outCanvas.width=w;outCanvas.height=h;
  const cc=outCanvas.getContext("2d",{willReadFrequently:true});cc.drawImage(sceneCanvas,0,0);
  const im=cc.getImageData(0,0,w,h);
- transformPixels(im,cal,Number($("strength").value)/100,$("exposure").checked);cc.putImageData(im,0,0);
+ transformPixels(im,cal,Number($("strength").value)/100,$("exposure").checked,Number($("temperature").value));cc.putImageData(im,0,0);
  showFrame("correctedFrame","correctedEmpty");outCanvas.style.display="block";
 }
 $("strength").oninput=()=>{$("strengthLabel").textContent=$("strength").value+"%";if(cal)renderPreview()};
+function refreshTemperature(){
+ const v=Number($("temperature").value);
+ $("temperatureLabel").textContent=v===0?"0 · 中性":(v<0?"偏冷 ":"偏暖 ")+Math.abs(v);
+ $("temperature").setAttribute("aria-valuetext",v===0?"中性":(v<0?"偏冷":"偏暖")+" "+Math.abs(v));
+ if(cal)renderPreview()
+}
+$("temperature").oninput=refreshTemperature;
+$("resetTemperature").onclick=()=>{$("temperature").value="0";refreshTemperature()};
 $("exposure").onchange=()=>{if(cal)renderPreview()};
 $("runBtn").onclick=()=>{
  try{
@@ -292,7 +311,7 @@ async function download(format){
   const step=180;
   for(let y=0;y<c.height;y+=step){
    const hh=Math.min(step,c.height-y),im=cx.getImageData(0,y,c.width,hh);
-   transformPixels(im,cal,Number($("strength").value)/100,$("exposure").checked);
+   transformPixels(im,cal,Number($("strength").value)/100,$("exposure").checked,Number($("temperature").value));
    cx.putImageData(im,0,y);
    if((y/step)%8===0){$("progressFill").style.width=(35+Math.round(45*y/c.height))+"%";await new Promise(r=>setTimeout(r,0))}
   }
