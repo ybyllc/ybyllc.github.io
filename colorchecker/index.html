@@ -1,0 +1,318 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="24色色卡照片校色工具：本地计算 AWB、CCM，预览并导出校正照片。">
+<title>ColorLab · 24 色卡照片校色</title>
+<style>
+:root{--bg:#090e18;--panel:#121a29;--panel2:#1a2535;--line:#2c394c;--text:#ecf2fb;--muted:#99a9bf;--blue:#77b9ff;--green:#71e5b5;--red:#fa8c8c}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse 80% 50% at 50% -15%,#1c3652 0%,#090e18 85%);color:var(--text);font:15px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif}button,input,select{font:inherit}button{cursor:pointer}button:disabled{cursor:not-allowed;opacity:.48}header{max-width:1180px;margin:auto;padding:48px 24px 26px}.brand{font-size:13px;letter-spacing:.16em;font-weight:800;color:var(--green);text-transform:uppercase}h1{margin:8px 0 12px;font-size:clamp(30px,5vw,49px);letter-spacing:-.04em;line-height:1.18}header p{margin:0;color:var(--muted);max-width:780px}main{max-width:1180px;margin:auto;padding:0 24px 64px}.card{border:1px solid var(--line);background:rgba(18,26,41,.92);border-radius:18px;padding:24px;box-shadow:0 10px 35px #0002;margin-bottom:20px}h2{margin:0 0 16px;font-size:21px}h3{margin:0 0 10px;font-size:16px}.num{display:inline-grid;place-items:center;width:28px;height:28px;border-radius:9px;background:#23466b;color:#c9e3ff;margin-right:9px;font-size:15px}p{margin:8px 0 14px}.hint,.small{color:var(--muted);font-size:13px}.row{display:flex;gap:16px;flex-wrap:wrap;align-items:center}.uploadgrid{display:grid;grid-template-columns:1fr 1fr;gap:20px}.uploadbox{padding:23px;border:1px dashed #53637a;border-radius:14px;background:#141e2e;min-height:160px;display:flex;flex-direction:column;align-items:flex-start;justify-content:center}.uploadbox strong{font-size:17px}.uploadbox span{font-size:13px;color:var(--muted)}.uploadbox input{display:none}.primary,.secondary,.smallbutton{border:0;border-radius:11px;padding:11px 18px;background:var(--blue);color:#061425;font-weight:750}.secondary,.smallbutton{background:#263852;color:#e6f1ff;border:1px solid #48607a}.smallbutton{padding:7px 12px;font-size:13px}.uploadbtn{display:inline-block;margin-top:12px;cursor:pointer}.toolbar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:15px 0}select{background:#1d2c40;color:#fff;padding:9px;border:1px solid #49617b;border-radius:9px;max-width:100%}.frame{position:relative;background:#06090f;border:1px solid #33465c;border-radius:13px;overflow:hidden;text-align:center}.frame canvas{display:block;width:100%;height:auto;max-height:530px;object-fit:contain;touch-action:none}.frame.empty{min-height:210px;display:grid;place-items:center;color:var(--muted)}.frame.empty canvas{display:none}.legend{display:flex;align-items:center;gap:12px;flex-wrap:wrap;color:var(--muted);font-size:12px;margin-top:9px}.legend i{display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--green);margin-right:4px}.patches{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:7px;margin-top:16px}.patch{height:43px;border-radius:7px;border:1px solid #ffffff24;display:flex;align-items:end;justify-content:flex-end;padding:4px 6px;font-size:11px;text-shadow:0 1px 3px #000b;color:#fff}.double{display:grid;grid-template-columns:1fr 1fr;gap:18px}.double .frame{min-height:180px}.double .frame canvas{max-height:460px}.options{display:flex;gap:25px;align-items:center;flex-wrap:wrap;margin:8px 0 18px}.options label{cursor:pointer}.range{display:flex;align-items:center;gap:12px}.range input{width:190px;max-width:50vw;accent-color:var(--blue)}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:16px}.stat{padding:12px;border-radius:12px;background:#19273a;border:1px solid #32435b}.stat strong{display:block;font-size:22px;letter-spacing:-.03em}.stat span{font-size:12px;color:var(--muted)}.status{border:1px solid #385871;background:#13283b;border-radius:12px;padding:10px 14px;color:#c9e6ff;font-size:13px;margin:16px 0}.status.warn{border-color:#846b3b;background:#352a1a;color:#ffe0a2}.status.ok{border-color:#2e7a61;background:#12352d;color:#a9f3d0}.footer{color:var(--muted);font-size:13px;line-height:1.8;margin-top:28px}pre{padding:16px;border-radius:10px;background:#070e19;overflow:auto;white-space:pre;font-size:12px;color:#bde0ff}details{margin-top:16px}summary{cursor:pointer;font-weight:600}.hidden{display:none!important}input[type=checkbox]{accent-color:var(--blue)}.progress{height:6px;background:#213048;border-radius:8px;overflow:hidden;display:none}.progress div{height:100%;background:var(--green);width:0%}.topchips{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}.chip{padding:5px 10px;border-radius:100px;background:#21384b;color:#c3e6fb;font-size:12px}.note{border-left:3px solid var(--green);padding-left:12px;color:#b9c7d9;font-size:13px;margin-top:14px}@media(max-width:760px){header{padding-top:28px}.uploadgrid,.double{grid-template-columns:1fr}.card{padding:16px}.stats{grid-template-columns:1fr 1fr}.double .frame{min-height:120px}}
+</style>
+</head>
+<body>
+<header>
+<div class="brand">COLORLAB / Camera Color Correction</div>
+<h1>一张色卡，校正你的照片。</h1>
+<p>上传同一台相机拍摄的 24 色卡和普通照片，自动估算白平衡（AWB）与 3×3 色彩矩阵（CCM），预览并保存。所有照片只在你的浏览器中处理，不传输到服务器。</p>
+<div class="topchips"><span class="chip">无须安装</span><span class="chip">自动寻找色卡外框</span><span class="chip">手动四角微调</span><span class="chip">JPG / PNG / WebP</span></div>
+</header>
+<main>
+<section class="card">
+<h2><span class="num">1</span> 上传两张照片</h2>
+<div class="uploadgrid">
+<div class="uploadbox"><strong>① 色卡照片</strong><span>包含完整的 6 × 4 ColorChecker Classic 类色卡</span><label class="primary uploadbtn" for="chartFile">选择色卡照片</label><input id="chartFile" type="file" accept="image/jpeg,image/png,image/webp"><div class="small" id="chartName" style="margin-top:10px">尚未选择</div></div>
+<div class="uploadbox"><strong>② 待校色照片</strong><span>建议与色卡照片同相机、同光源、同照片风格</span><label class="primary uploadbtn" for="sceneFile">选择普通照片</label><input id="sceneFile" type="file" accept="image/jpeg,image/png,image/webp"><div class="small" id="sceneName" style="margin-top:10px">尚未选择</div></div>
+</div>
+</section>
+<section class="card">
+<h2><span class="num">2</span> 确认色卡定位</h2>
+<p class="hint">上传后会尝试自动定位黑色外边框。若绿色框不准确，点击「重新标记四角」，依次点击色卡的左上 → 右上 → 右下 → 左下。绿色圆点也可直接拖动。</p>
+<div class="toolbar"><button id="autoBtn" class="smallbutton" disabled>自动定位</button><button id="manualBtn" class="smallbutton" disabled>重新标记四角</button><label for="orientation">色卡方向</label><select id="orientation"><option value="auto">自动识别</option><option value="rot">顶部黑 → 白（你的参考图方向）</option><option value="normal">顶部棕色 / 肤色（标准方向）</option></select></div>
+<div class="frame empty" id="chartFrame"><canvas id="chartCanvas"></canvas><div id="chartEmpty">请先上传色卡照片</div></div>
+<div class="legend"><span><i></i>绿色线：色卡外边框</span><span>小圆点：实际采样中心</span><span id="cornerHint">尚未标记</span></div>
+<div id="patches" class="patches hidden"></div>
+<div class="note">请确保 24 个色块完整、清晰且没有反光。此工具内置的是常见 ColorChecker Classic 24 色的近似 sRGB 参考值；如果你的色卡不是这一型号，结果只能作近似校色。</div>
+</section>
+<section class="card">
+<h2><span class="num">3</span> 生成并下载校色照片</h2>
+<div class="options">
+<div class="range"><label for="strength">校正强度</label><input id="strength" type="range" min="0" max="100" value="80"><strong id="strengthLabel">80%</strong></div>
+<label><input id="exposure" type="checkbox"> 同时匹配色卡曝光亮度（谨慎开启）</label>
+</div>
+<div class="toolbar"><button id="runBtn" class="primary" disabled>开始校色</button><button id="jpgBtn" class="secondary" disabled>下载 JPG</button><button id="pngBtn" class="secondary" disabled>下载 PNG</button></div>
+<div class="progress" id="progress"><div id="progressFill"></div></div>
+<div id="status" class="status">请先上传色卡照片和待校色照片。</div>
+<div class="double">
+<div><h3>原始照片</h3><div class="frame empty" id="originalFrame"><canvas id="originalCanvas"></canvas><div id="originalEmpty">等待上传普通照片</div></div></div>
+<div><h3>校色结果</h3><div class="frame empty" id="correctedFrame"><canvas id="correctedCanvas"></canvas><div id="correctedEmpty">点击「开始校色」查看效果</div></div></div>
+</div>
+<div id="stats" class="stats hidden">
+<div class="stat"><strong id="statR">—</strong><span>R Gain</span></div>
+<div class="stat"><strong id="statB">—</strong><span>B Gain</span></div>
+<div class="stat"><strong id="statError">—</strong><span>色卡拟合平均 ΔE76（估算）</span></div>
+</div>
+<details id="details" class="hidden"><summary>查看 3×3 CCM 和标定参数</summary><pre id="matrixOutput"></pre></details>
+</section>
+<div class="footer">本工具是面向已处理 JPG/PNG 照片的近似颜色匹配工具，不是 RAW 级 ISP 量产标定。对已经自动白平衡、Gamma、HDR、局部调色的图像，3×3 CCM 不可能完全逆转所有 ISP 效果；不同光源或曝光时建议重新拍色卡。浏览器会读取图片像素并假定它们已经处于 sRGB 色彩空间。<br>技术实现：中性灰估计 AWB → 近似曝光归一化 → 加权最小二乘拟合保灰轴的线性 CCM → 可调强度导出。数据完全本地处理。</div>
+</main>
+<script>
+"use strict";
+const REF=[
+[115,82,68],[194,150,130],[98,122,157],[87,108,67],[133,128,177],[103,189,170],
+[214,126,44],[80,91,166],[193,90,99],[94,60,108],[157,188,64],[224,163,46],
+[56,61,150],[70,148,73],[175,54,60],[231,199,31],[187,86,149],[8,133,161],
+[243,243,242],[200,200,200],[160,160,160],[122,122,121],[85,85,85],[52,52,52]
+];
+const $=id=>document.getElementById(id);
+const chartCanvas=$("chartCanvas"),sceneCanvas=$("originalCanvas"),outCanvas=$("correctedCanvas");
+const ctx=chartCanvas.getContext("2d",{willReadFrequently:true});
+const LUT=Float32Array.from({length:256},(_,i)=>{const c=i/255;return c<=.04045?c/12.92:Math.pow((c+.055)/1.055,2.4)});
+const ENCODE=new Uint8Array(65536);
+for(let i=0;i<65536;i++){const x=i/65535;ENCODE[i]=Math.round(255*(x<=.0031308?12.92*x:1.055*Math.pow(x,1/2.4)-.055))}
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const median=a=>{const v=[...a].sort((x,y)=>x-y);return v[Math.floor(v.length/2)]};
+let chartImage=null,photoImage=null,chartData=null,points=null,markIndex=-1,dragIndex=-1,cal=null,runSerial=0;
+function status(msg,type=""){const e=$("status");e.textContent=msg;e.className="status"+(type?" "+type:"")}
+function showFrame(id,empty){$(id).classList.remove("empty");$(empty).classList.add("hidden")}
+function loadBitmap(file){return new Promise((resolve,reject)=>{if(!file||!file.type.startsWith("image/")){reject(new Error("文件不是可识别的图片"));return}if(file.size>80*1024*1024){reject(new Error("图片文件请小于 80 MB"));return}createImageBitmap(file,{imageOrientation:"from-image"}).then(resolve,reject)})}
+function canvasFromImage(image,maxDim){let scale=Math.min(1,maxDim/Math.max(image.width,image.height));let c=document.createElement("canvas");c.width=Math.max(1,Math.round(image.width*scale));c.height=Math.max(1,Math.round(image.height*scale));c.getContext("2d",{willReadFrequently:true}).drawImage(image,0,0,c.width,c.height);return c}
+async function onChartUpload(file){
+ try{
+  const im=await loadBitmap(file);if(chartImage)chartImage.close();chartImage=im;
+  const base=canvasFromImage(im,1200);chartCanvas.width=base.width;chartCanvas.height=base.height;
+  ctx.drawImage(base,0,0);chartData=ctx.getImageData(0,0,base.width,base.height);
+  showFrame("chartFrame","chartEmpty");$("chartName").textContent=file.name+" · "+im.width+" × "+im.height;
+  $("autoBtn").disabled=false;$("manualBtn").disabled=false;
+  if(!autoLocate()){points=[[.08,.08],[.92,.08],[.92,.92],[.08,.92]];status("未能可靠自动识别色卡，请手动点击四个外框角点。","warn");}
+  else status("已尝试自动定位色卡：请确认绿色线贴合黑色外边框。","ok");
+  markIndex=-1;drawChart();updatePatches();invalidate();syncButtons();
+ }catch(e){status("读取色卡失败："+e.message,"warn")}
+}
+async function onPhotoUpload(file){
+ try{
+  const im=await loadBitmap(file);if(photoImage)photoImage.close();photoImage=im;
+  $("sceneName").textContent=file.name+" · "+im.width+" × "+im.height;
+  const preview=canvasFromImage(im,1400);sceneCanvas.width=preview.width;sceneCanvas.height=preview.height;
+  sceneCanvas.getContext("2d").drawImage(preview,0,0);showFrame("originalFrame","originalEmpty");
+  invalidate();syncButtons();if(chartImage)status("两张图片已经就绪。确认色卡四角和方向后，点击「开始校色」。","ok");
+ }catch(e){status("读取普通照片失败："+e.message,"warn")}
+}
+function invalidate(){cal=null;$("jpgBtn").disabled=true;$("pngBtn").disabled=true;$("stats").classList.add("hidden");$("details").classList.add("hidden");$("correctedFrame").classList.add("empty");$("correctedEmpty").classList.remove("hidden");outCanvas.style.display="none"}
+function syncButtons(){$("runBtn").disabled=!(chartData&&photoImage&&points)}
+function autoLocate(){
+ if(!chartData)return false;
+ const src=chartCanvas,W=Math.min(520,src.width),H=Math.max(1,Math.round(src.height*W/src.width));
+ const c=document.createElement("canvas");c.width=W;c.height=H;
+ const cx=c.getContext("2d",{willReadFrequently:true});cx.drawImage(src,0,0,W,H);
+ const d=cx.getImageData(0,0,W,H).data,n=W*H;
+ const luma=new Uint8Array(n);
+ for(let p=0;p<n;p++){let q=p*4;luma[p]=Math.round(d[q]*.299+d[q+1]*.587+d[q+2]*.114)}
+ const queue=new Int32Array(n);let best=null,bestScore=-1;
+ for(const threshold of [45,65,85]){
+  const seen=new Uint8Array(n);
+  for(let y=0;y<H;y++)for(let x=0;x<W;x++){
+   const start=y*W+x;if(seen[start]||luma[start]>=threshold)continue;
+   let head=0,tail=1;queue[0]=start;seen[start]=1;
+   let minX=x,maxX=x,minY=y,maxY=y;
+   while(head<tail){
+    const p=queue[head++],xx=p%W,yy=(p/W)|0;
+    if(xx<minX)minX=xx;if(xx>maxX)maxX=xx;if(yy<minY)minY=yy;if(yy>maxY)maxY=yy;
+    const neighbors=[p-1,p+1,p-W,p+W];
+    for(let k=0;k<4;k++){
+      if((k===0&&xx===0)||(k===1&&xx===W-1)||(k===2&&yy===0)||(k===3&&yy===H-1))continue;
+      const np=neighbors[k];
+      if(!seen[np]&&luma[np]<threshold){seen[np]=1;queue[tail++]=np}
+    }
+   }
+   const w=maxX-minX+1,h=maxY-minY+1,ratio=w/h,fill=tail/(w*h);
+   if(w<W*.14||h<H*.13||w>W*.97||h>H*.96)continue;
+   if(ratio<1.25||ratio>2.15||fill<.09||fill>.79)continue;
+   const touch=minX===0||minY===0||maxX===W-1||maxY===H-1;
+   if(touch)continue;
+   const score=(w*h)*Math.exp(-2*Math.abs(Math.log(ratio/1.7)))*(1-Math.abs(fill-.4)*.45);
+   if(score>bestScore){bestScore=score;best=[minX/W,minY/H,(maxX+1)/W,(maxY+1)/H]}
+  }
+ }
+ if(!best)return false;
+ points=[[best[0],best[1]],[best[2],best[1]],[best[2],best[3]],[best[0],best[3]]];return true
+}
+function quad(u,v){const p=points;return [(1-u)*(1-v)*p[0][0]+u*(1-v)*p[1][0]+u*v*p[2][0]+(1-u)*v*p[3][0],(1-u)*(1-v)*p[0][1]+u*(1-v)*p[1][1]+u*v*p[2][1]+(1-u)*v*p[3][1]]}
+function patchPoint(r,c){return quad(.05+.9*(c+.5)/6,.04+.925*(r+.5)/4)}
+function drawChart(){
+ if(!chartData)return;
+ ctx.putImageData(chartData,0,0);
+ const w=chartCanvas.width,h=chartCanvas.height;ctx.save();ctx.lineWidth=Math.max(2,w/350);
+ if(points){
+ ctx.strokeStyle="#70efbd";ctx.beginPath();for(let i=0;i<4;i++){const p=points[i];if(i===0)ctx.moveTo(p[0]*w,p[1]*h);else ctx.lineTo(p[0]*w,p[1]*h)}ctx.closePath();ctx.stroke();
+ for(let i=0;i<4;i++){const p=points[i];ctx.beginPath();ctx.arc(p[0]*w,p[1]*h,Math.max(8,w/110),0,Math.PI*2);ctx.fillStyle=i===markIndex?"#ffcb76":"#70efbd";ctx.fill();ctx.strokeStyle="#071621";ctx.stroke();ctx.fillStyle="#05111c";ctx.font="bold "+Math.max(10,w/70)+"px system-ui";ctx.textAlign="center";ctx.textBaseline="middle";ctx.fillText(String(i+1),p[0]*w,p[1]*h)}
+ for(let r=0;r<4;r++)for(let c=0;c<6;c++){const q=patchPoint(r,c);ctx.beginPath();ctx.arc(q[0]*w,q[1]*h,Math.max(2,w/260),0,Math.PI*2);ctx.fillStyle="#fff";ctx.fill();ctx.strokeStyle="#142b2b";ctx.lineWidth=1;ctx.stroke()}
+ }
+ ctx.restore();
+}
+function pos(event){const rect=chartCanvas.getBoundingClientRect();return [clamp((event.clientX-rect.left)/rect.width,0,1),clamp((event.clientY-rect.top)/rect.height,0,1)]}
+chartCanvas.addEventListener("pointerdown",e=>{
+ if(!points)return;
+ const xy=pos(e);
+ if(markIndex>=0){points[markIndex]=xy;markIndex++;if(markIndex>=4)markIndex=-1;updateMarkHint();drawChart();updatePatches();invalidate();syncButtons();return}
+ let nearest=-1,dist=.035*.035;
+ for(let i=0;i<4;i++){const dx=(xy[0]-points[i][0])*chartCanvas.width/chartCanvas.height,dy=xy[1]-points[i][1],d=dx*dx+dy*dy;if(d<dist){dist=d;nearest=i}}
+ if(nearest>=0){dragIndex=nearest;chartCanvas.setPointerCapture(e.pointerId);e.preventDefault()}
+});
+chartCanvas.addEventListener("pointermove",e=>{if(dragIndex<0)return;points[dragIndex]=pos(e);drawChart();e.preventDefault()});
+function stopDrag(){if(dragIndex>=0){dragIndex=-1;updatePatches();invalidate();syncButtons()}}
+chartCanvas.addEventListener("pointerup",stopDrag);chartCanvas.addEventListener("pointercancel",stopDrag);
+function updateMarkHint(){$("cornerHint").textContent=markIndex<0?"可拖动绿色角点":("请点击第 "+(markIndex+1)+" 个角："+["左上","右上","右下","左下"][markIndex])}
+$("autoBtn").onclick=()=>{if(autoLocate()){markIndex=-1;drawChart();updatePatches();invalidate();status("自动定位完成，请目视检查四角。","ok")}else status("未找到明显的完整色卡，请用手动标记。","warn")};
+$("manualBtn").onclick=()=>{markIndex=0;updateMarkHint();drawChart();status("请依次点击色卡黑色外框的左上、右上、右下、左下四角。")};
+$("orientation").onchange=()=>{updatePatches();invalidate()};
+function samplePatches(){
+ const d=chartData.data,w=chartData.width,h=chartData.height,colors=[];
+ for(let r=0;r<4;r++)for(let c=0;c<6;c++){
+  const buckets=[[],[],[]];
+  const center=patchPoint(r,c);
+  for(let yy=-2;yy<=2;yy++)for(let xx=-2;xx<=2;xx++){
+   const q=quad(.05+.9*(c+.5)/6+xx*.004,.04+.925*(r+.5)/4+yy*.006);
+   const x=clamp(Math.round(q[0]*(w-1)),0,w-1),y=clamp(Math.round(q[1]*(h-1)),0,h-1),idx=(y*w+x)*4;
+   for(let channel=0;channel<3;channel++)buckets[channel].push(d[idx+channel]);
+  }
+  colors.push(buckets.map(median))
+ }
+ return colors
+}
+function neutralScore(colors,row){const ratios=[];for(let k=1;k<=4;k++){let p=colors[row*6+k].map(v=>LUT[v]);if(p[1]<.004)continue;ratios.push([p[0]/p[1],p[2]/p[1]])}if(ratios.length<3)return 100;const medR=median(ratios.map(x=>x[0])),medB=median(ratios.map(x=>x[1]));return ratios.reduce((s,x)=>s+Math.abs(x[0]-medR)+Math.abs(x[1]-medB),0)/ratios.length}
+function resolvedOrientation(colors){const requested=$("orientation").value;return requested==="auto"?(neutralScore(colors,0)<neutralScore(colors,3)?"rot":"normal"):requested}
+function updatePatches(){
+ if(!chartData||!points)return;
+ const colors=samplePatches(),ori=resolvedOrientation(colors),root=$("patches");root.innerHTML="";root.classList.remove("hidden");
+ for(let i=0;i<colors.length;i++){
+  let el=document.createElement("div");el.className="patch";
+  el.style.background="rgb("+colors[i].join(",")+")";el.textContent=String(ori==="rot"?24-i:i+1);
+  el.title="参考编号 "+el.textContent+" ｜ 实测 RGB: "+colors[i].join(", ");root.append(el);
+ }
+ updateMarkHint();if($("orientation").value==="auto")$("cornerHint").textContent+=" · 自动判定："+(ori==="rot"?"顶部灰阶":"底部灰阶")
+}
+function xyzLab(rgb){
+ const lin=rgb.map(x=>LUT[clamp(Math.round(x),0,255)]),r=lin[0],g=lin[1],b=lin[2];
+ const v=[(.4124564*r+.3575761*g+.1804375*b)/.95047,(.2126729*r+.7151522*g+.072175*b),(.0193339*r+.119192*g+.9503041*b)/1.08883];
+ const f=t=>t>216/24389?Math.cbrt(t):(24389/27*t+16)/116;
+ const x=f(v[0]),y=f(v[1]),z=f(v[2]);return [116*y-16,500*(x-y),200*(y-z)]
+}
+function colorError(a,b){const x=xyzLab(a),y=xyzLab(b);return Math.hypot(x[0]-y[0],x[1]-y[1],x[2]-y[2])}
+function fromLinear(v){return ENCODE[Math.round(clamp(v,0,1)*65535)]}
+function fitCalibration(){
+ const measured=samplePatches(),orient=resolvedOrientation(measured);
+ const ordered=new Array(24);
+ measured.forEach((p,i)=>ordered[orient==="rot"?23-i:i]=p);
+ const inp=ordered.map(p=>p.map(v=>LUT[v])),target=REF.map(p=>p.map(v=>LUT[v]));
+ // 选用三块中间灰，避开最白与最黑的截断、噪声。
+ const gray=[19,20,21];
+ const gains=[
+  clamp(median(gray.map(i=>inp[i][1]/Math.max(inp[i][0],.0001))),.45,2.8),1,
+  clamp(median(gray.map(i=>inp[i][1]/Math.max(inp[i][2],.0001))),.45,2.8)
+ ];
+ const afterAWB=inp.map(v=>v.map((x,i)=>x*gains[i]));
+ const ratios=gray.map(i=>target[i][1]/Math.max(.0001,afterAWB[i][1]));
+ const exposure=clamp(median(ratios),.2,5);
+ const X=afterAWB.map(v=>v.map(x=>x*exposure));
+ // 正则化与中性轴保持：每行和为1，主色对肤色稍加权重。
+ const ccm=[];
+ for(let channel=0;channel<3;channel++){
+  let aa=.045,ab=0,bb=.045;
+  const prior=channel===0?[1,0]:channel===1?[0,1]:[0,0];
+  let ba=.045*prior[0],bc=.045*prior[1];
+  for(let i=0;i<24;i++){
+   if(i===18||i===23)continue;
+   const w=i<2?1.7:(i>=19?.35:1);
+   let a=X[i][0]-X[i][2],b=X[i][1]-X[i][2],t=target[i][channel]-X[i][2];
+   aa+=w*a*a;ab+=w*a*b;bb+=w*b*b;ba+=w*a*t;bc+=w*b*t
+  }
+  const det=aa*bb-ab*ab;
+  const a=(ba*bb-bc*ab)/det,b=(bc*aa-ba*ab)/det;
+  // 限制过强的混色系数，避免照片大面积失真。
+  const ca=clamp(a,-1.25,2.25),cb=clamp(b,-1.25,2.25);
+  ccm.push([ca,cb,1-ca-cb]);
+ }
+ const predicted=X.map(x=>applyMatrix(x,ccm).map(fromLinear));
+ const error=predicted.reduce((s,r,i)=>s+colorError(r,REF[i]),0)/24;
+ const risk=ordered.some((p,i)=>i>=19&&i<=22&&p.some(v=>v>=251||v<=12));
+ return {gains,exposure,ccm,error,orient,risk,ordered}
+}
+function applyMatrix(v,M){return M.map(row=>v[0]*row[0]+v[1]*row[1]+v[2]*row[2])}
+function transformPixels(imageData,model,strength,withExposure){
+ const d=imageData.data,gain=model.gains,M=model.ccm,e=withExposure?model.exposure:1,k=strength;
+ const m00=M[0][0],m01=M[0][1],m02=M[0][2],m10=M[1][0],m11=M[1][1],m12=M[1][2],m20=M[2][0],m21=M[2][1],m22=M[2][2];
+ for(let j=0;j<d.length;j+=4){
+  const r=LUT[d[j]],g=LUT[d[j+1]],b=LUT[d[j+2]];
+  const rr=r*gain[0]*e,gg=g*e,bb=b*gain[2]*e;
+  const nr=m00*rr+m01*gg+m02*bb,ng=m10*rr+m11*gg+m12*bb,nb=m20*rr+m21*gg+m22*bb;
+  d[j]=fromLinear(r*(1-k)+nr*k);d[j+1]=fromLinear(g*(1-k)+ng*k);d[j+2]=fromLinear(b*(1-k)+nb*k);
+ }
+ return imageData
+}
+function renderPreview(){
+ if(!photoImage||!cal)return;
+ const w=sceneCanvas.width,h=sceneCanvas.height;outCanvas.width=w;outCanvas.height=h;
+ const cc=outCanvas.getContext("2d",{willReadFrequently:true});cc.drawImage(sceneCanvas,0,0);
+ const im=cc.getImageData(0,0,w,h);
+ transformPixels(im,cal,Number($("strength").value)/100,$("exposure").checked);cc.putImageData(im,0,0);
+ showFrame("correctedFrame","correctedEmpty");outCanvas.style.display="block";
+}
+$("strength").oninput=()=>{$("strengthLabel").textContent=$("strength").value+"%";if(cal)renderPreview()};
+$("exposure").onchange=()=>{if(cal)renderPreview()};
+$("runBtn").onclick=()=>{
+ try{
+  if(!photoImage||!chartData||!points)return;
+  cal=fitCalibration();renderPreview();
+  $("statR").textContent=cal.gains[0].toFixed(3);
+  $("statB").textContent=cal.gains[2].toFixed(3);
+  $("statError").textContent=cal.error.toFixed(1);
+  $("stats").classList.remove("hidden");$("details").classList.remove("hidden");
+  $("matrixOutput").textContent="AWB 增益 [R, G, B]\n"+cal.gains.map(x=>x.toFixed(5)).join(", ")+"\n\nCCM (行优先)\n"+cal.ccm.map(row=>row.map(x=>x.toFixed(5)).join("   ")).join("\n")+"\n\n色卡拟合时的亮度归一化系数: "+cal.exposure.toFixed(4)+"\n方向: "+(cal.orient==="rot"?"旋转180°":"标准方向")+"\n参考色域: sRGB / D65 (近似)\n色差指标: CIE 1976 ΔE76 (非 ΔE00)";
+  $("jpgBtn").disabled=false;$("pngBtn").disabled=false;
+  if(cal.risk)status("校色完成。但灰阶有疑似过曝或过暗区域，请检查曝光和角点。当前平均色差是拟合估算，不能代替实测验证。","warn");
+  else status("校色完成！请比较原图与结果，并适当调节校正强度；满意后点击下载。","ok");
+ }catch(e){status("计算失败："+e.message,"warn");console.error(e)}
+};
+async function download(format){
+ if(!cal||!photoImage)return;
+ const btn=$(format==="png"?"pngBtn":"jpgBtn");btn.disabled=true;
+ $("progress").style.display="block";$("progressFill").style.width="12%";
+ status("正在生成可下载的图片。较大图片会占用更多浏览器内存。");
+ try{
+  await new Promise(r=>setTimeout(r,40));
+  const w=photoImage.width,h=photoImage.height;
+  const scale=Math.min(1,5200/Math.max(w,h),Math.sqrt(18000000/(w*h)));
+  const c=document.createElement("canvas");c.width=Math.max(1,Math.round(w*scale));c.height=Math.max(1,Math.round(h*scale));
+  const cx=c.getContext("2d",{willReadFrequently:true});if(!cx)throw new Error("无法创建画布，图片可能太大");
+  cx.drawImage(photoImage,0,0,c.width,c.height);
+  $("progressFill").style.width="35%";
+  await new Promise(r=>setTimeout(r,30));
+  // 分块处理，避免一次性申请整个图像的双倍内存。
+  const step=180;
+  for(let y=0;y<c.height;y+=step){
+   const hh=Math.min(step,c.height-y),im=cx.getImageData(0,y,c.width,hh);
+   transformPixels(im,cal,Number($("strength").value)/100,$("exposure").checked);
+   cx.putImageData(im,0,y);
+   if((y/step)%8===0){$("progressFill").style.width=(35+Math.round(45*y/c.height))+"%";await new Promise(r=>setTimeout(r,0))}
+  }
+  $("progressFill").style.width="90%";
+  const mime=format==="png"?"image/png":"image/jpeg";
+  const blob=await new Promise(r=>c.toBlob(r,mime,.94));
+  if(!blob)throw new Error("导出失败");
+  const url=URL.createObjectURL(blob),a=document.createElement("a");
+  const base=$("sceneFile").files[0]?.name.replace(/\.[^.]+$/,"")||"photo";
+  a.href=url;a.download=base+"_colorlab."+format;document.body.append(a);a.click();a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),20000);
+  $("progressFill").style.width="100%";
+  const resize=scale<.999?"已按浏览器内存限制缩至 "+c.width+" × "+c.height+"。":"保持原图分辨率。";
+  status("已生成校色 "+format.toUpperCase()+" 下载文件。"+resize,"ok");
+ }catch(e){status("导出失败："+e.message,"warn");console.error(e)}
+ finally{btn.disabled=false;setTimeout(()=>{$("progress").style.display="none"},1200)}
+}
+$("jpgBtn").onclick=()=>download("jpg");$("pngBtn").onclick=()=>download("png");
+$("chartFile").onchange=e=>{if(e.target.files[0])onChartUpload(e.target.files[0])};
+$("sceneFile").onchange=e=>{if(e.target.files[0])onPhotoUpload(e.target.files[0])};
+</script>
+</body>
+</html>
