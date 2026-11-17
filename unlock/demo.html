@@ -88,7 +88,7 @@
       cancelHold();
       button.setPointerCapture(event.pointerId);
       button.classList.add('armed');
-      holdTimer = setTimeout(() => { cancelHold(); unlock(); }, 900);
+      holdTimer = setTimeout(() => { cancelHold(); unlock(); }, 500);
     });
     for (const name of ['pointerup', 'pointercancel', 'lostpointercapture'])
       button.addEventListener(name, cancelHold);
