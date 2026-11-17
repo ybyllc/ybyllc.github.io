@@ -22,11 +22,13 @@
     .reveal { display: flex; align-items: center; gap: 8px; margin-top: 14px; color: #53645b; font-size: 14px; font-weight: 400; }
     .reveal input { width: 18px; height: 18px; }
     .clear { margin-top: 12px; border: 0; background: none; color: #176a54; font-size: 14px; padding: 8px 0; }
-    .action { position: relative; overflow: hidden; width: 100%; height: 76px; margin-top: 20px; border: 0; border-radius: 6px; background: #176a54; box-shadow: 0 4px 0 #0d4c3c; color: #fff; font-size: 20px; font-weight: 700; touch-action: none; user-select: none; -webkit-user-select: none; transition: transform .12s, box-shadow .12s; }
-    .action.armed { transform: translateY(3px); box-shadow: 0 1px 0 #0d4c3c; background: #10523f; }
-    .action:disabled { background: #9aaba1; box-shadow: none; transform: none; }
+    .action { position: relative; overflow: hidden; width: 100%; height: 76px; margin-top: 20px; border: 0; border-radius: 6px; background: #176a54; box-shadow: 0 4px 0 #0d4c3c; color: #fff; font-size: 20px; font-weight: 700; touch-action: none; user-select: none; -webkit-user-select: none; transition: transform .15s ease-out, box-shadow .15s ease-out; }
+    .action.armed { transform: scale(.94); box-shadow: 0 1px 0 #0d4c3c; background: #10523f; }
+    .action.complete { animation: button-pop .42s ease-out; }
+    .action:disabled:not(.complete) { background: #9aaba1; box-shadow: none; }
     .action-label { position: relative; z-index: 1; }
-    .hold-progress { position: absolute; left: 0; bottom: 0; width: 0; height: 8px; background: #a5e9c5; }
+    .hold-wave { position: absolute; left: 50%; top: 50%; width: 140%; aspect-ratio: 1; border-radius: 50%; background: #2a9f78; transform: translate(-50%, -50%) scale(0); pointer-events: none; }
+    @keyframes button-pop { 0% { transform: scale(.94); } 45% { transform: scale(1.07); } 75% { transform: scale(.985); } 100% { transform: scale(1); } }
     #status { min-height: 26px; margin: 18px 0 0; color: #53645b; font-size: 15px; }
     #status.error { color: #ab3830; }
     .back { display: inline-block; margin-top: 26px; color: #176a54; text-decoration: none; font-size: 15px; }
@@ -41,7 +43,7 @@
       <input id="password" type="password" inputmode="text" autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="24" placeholder="输入示例密码 demo1234">
       <label class="reveal"><input id="reveal" type="checkbox">显示密码</label>
       <button id="clear" class="clear" type="button">清除输入</button>
-      <button id="unlock" class="action" type="button"><span id="action-label" class="action-label">长按开锁</span><span id="hold-progress" class="hold-progress" aria-hidden="true"></span></button>
+      <button id="unlock" class="action" type="button"><span id="hold-wave" class="hold-wave" aria-hidden="true"></span><span id="action-label" class="action-label">长按开锁</span></button>
       <p id="status" role="status" aria-live="polite"></p>
     </div>
     <a class="back" href="index.html?manual=1">返回设备连接</a>
@@ -50,7 +52,7 @@
     const password = document.querySelector('#password');
     const button = document.querySelector('#unlock');
     const actionLabel = document.querySelector('#action-label');
-    const holdProgress = document.querySelector('#hold-progress');
+    const holdWave = document.querySelector('#hold-wave');
     const status = document.querySelector('#status');
     const holdMs = 500;
     let holdFrame = 0;
@@ -73,17 +75,29 @@
       holdFrame = 0;
       activePointer = null;
       button.classList.remove('armed');
-      holdProgress.style.width = '0%';
+      holdWave.style.transform = 'translate(-50%, -50%) scale(0)';
       if (!busy) actionLabel.textContent = '长按开锁';
+    }
+    function completeHold() {
+      // 长按完成后先保留填充圆，等回弹结束再复位，避免请求状态打断动画。
+      cancelAnimationFrame(holdFrame);
+      holdFrame = 0;
+      activePointer = null;
+      button.classList.remove('armed');
+      holdWave.style.transform = 'translate(-50%, -50%) scale(1)';
+      button.classList.add('complete');
+      setTimeout(() => {
+        button.classList.remove('complete');
+        holdWave.style.transform = 'translate(-50%, -50%) scale(0)';
+      }, 420);
+      unlock();
     }
     function updateHold(now) {
       if (activePointer === null) return;
-      const percent = Math.min(100, Math.round((now - holdStart) / holdMs * 100));
-      holdProgress.style.width = `${percent}%`;
-      actionLabel.textContent = `确认中 ${percent}%`;
-      if (percent >= 100) {
-        cancelHold();
-        unlock();
+      const progress = Math.min(1, (now - holdStart) / holdMs);
+      holdWave.style.transform = `translate(-50%, -50%) scale(${progress})`;
+      if (progress >= 1) {
+        completeHold();
       } else {
         holdFrame = requestAnimationFrame(updateHold);
       }
@@ -91,6 +105,7 @@
     function unlock() {
       if (password.value !== 'demo1234') {
         message('示例密码不正确', true);
+        actionLabel.textContent = '长按开锁';
         return;
       }
       busy = true;
@@ -108,11 +123,12 @@
       }, 6400);
     }
     button.addEventListener('pointerdown', event => {
-      if (busy || activePointer !== null || event.button !== 0) return;
+      if (busy || activePointer !== null || button.classList.contains('complete') || event.button !== 0) return;
       cancelHold();
       activePointer = event.pointerId;
       button.setPointerCapture(event.pointerId);
       button.classList.add('armed');
+      actionLabel.textContent = '正在确认';
       holdStart = performance.now();
       holdFrame = requestAnimationFrame(updateHold);
     });
