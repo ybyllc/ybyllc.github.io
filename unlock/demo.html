@@ -22,10 +22,10 @@
     .reveal { display: flex; align-items: center; gap: 8px; margin-top: 14px; color: #53645b; font-size: 14px; font-weight: 400; }
     .reveal input { width: 18px; height: 18px; }
     .clear { margin-top: 12px; border: 0; background: none; color: #176a54; font-size: 14px; padding: 8px 0; }
-    .action { position: relative; overflow: hidden; width: 100%; height: 76px; margin-top: 20px; border: 0; border-radius: 6px; background: #176a54; box-shadow: 0 4px 0 #0d4c3c; color: #fff; font-size: 20px; font-weight: 700; touch-action: none; user-select: none; -webkit-user-select: none; transition: transform .15s ease-out, box-shadow .15s ease-out; }
-    .action.armed { transform: scale(.94); box-shadow: 0 1px 0 #0d4c3c; background: #10523f; }
+    .action { position: relative; overflow: hidden; width: 100%; height: 76px; margin-top: 20px; border: 0; border-radius: 6px; background: #176a54; color: #fff; font-size: 20px; font-weight: 700; touch-action: none; user-select: none; -webkit-user-select: none; transition: transform .15s ease-out; }
+    .action.armed { transform: scale(.94); background: #10523f; }
     .action.complete { animation: button-pop .42s ease-out; }
-    .action:disabled:not(.complete) { background: #9aaba1; box-shadow: none; }
+    .action.success { background: #2a9f78; }
     .action-label { position: relative; z-index: 1; }
     .hold-wave { position: absolute; left: 50%; top: 50%; width: 140%; aspect-ratio: 1; border-radius: 50%; background: #2a9f78; transform: translate(-50%, -50%) scale(0); pointer-events: none; }
     @keyframes button-pop { 0% { transform: scale(.94); } 45% { transform: scale(1.07); } 75% { transform: scale(.985); } 100% { transform: scale(1); } }
@@ -85,6 +85,7 @@
       activePointer = null;
       button.classList.remove('armed');
       holdWave.style.transform = 'translate(-50%, -50%) scale(1)';
+      button.classList.add('success');
       button.classList.add('complete');
       setTimeout(() => {
         button.classList.remove('complete');
@@ -119,6 +120,7 @@
     }
     button.addEventListener('pointerdown', event => {
       if (busy || activePointer !== null || button.classList.contains('complete') || event.button !== 0) return;
+      button.classList.remove('success');
       // 密码在按下时判定；错误输入不启动长按，也不会在延迟后开锁。
       if (password.value !== 'demo1234') {
         message('示例密码不正确', true);
