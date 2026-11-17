@@ -22,6 +22,7 @@
     button:active { background: #10523f; }
     #status { min-height: 22px; margin: 16px 0 0; color: #ab3830; font-size: 14px; }
     .secondary { margin-top: 8px; background: transparent; color: #176a54; border: 1px solid #9daea4; }
+    .demo { display: grid; place-items: center; height: 56px; margin-top: 28px; border: 1px solid #9daea4; border-radius: 6px; color: #176a54; text-decoration: none; font-size: 17px; font-weight: 600; }
   </style>
 </head>
 <body>
@@ -38,6 +39,7 @@
       <button id="manual" class="secondary" type="button" hidden>取消自动连接</button>
       <p id="status" role="status" aria-live="polite"></p>
     </form>
+    <a class="demo" href="demo.html">体验示例设备</a>
   </main>
   <script>
     const form = document.querySelector('#connect');
