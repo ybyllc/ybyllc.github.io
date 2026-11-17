@@ -21,6 +21,7 @@
     button { width: 100%; height: 56px; margin-top: 18px; border: 0; border-radius: 6px; background: #176a54; color: #fff; font-size: 17px; font-weight: 600; }
     button:active { background: #10523f; }
     #status { min-height: 22px; margin: 16px 0 0; color: #ab3830; font-size: 14px; }
+    .secondary { margin-top: 8px; background: transparent; color: #176a54; border: 1px solid #9daea4; }
   </style>
 </head>
 <body>
@@ -34,6 +35,7 @@
       <label for="address">设备 IP 地址</label>
       <input id="address" name="address" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" placeholder="192.168.1.100" required>
       <button type="submit">连接设备</button>
+      <button id="manual" class="secondary" type="button" hidden>取消自动连接</button>
       <p id="status" role="status" aria-live="polite"></p>
     </form>
   </main>
@@ -41,19 +43,37 @@
     const form = document.querySelector('#connect');
     const address = document.querySelector('#address');
     const status = document.querySelector('#status');
-    address.value = localStorage.getItem('unlockDeviceIp') || '';
+    const manual = document.querySelector('#manual');
+    let lastIp = '';
+    try { lastIp = localStorage.getItem('unlockDeviceIp') || ''; } catch (_) {}
+    address.value = lastIp;
+    const validIp = ip => ip.split('.').length === 4 && ip.split('.').every(part =>
+      /^\d{1,3}$/.test(part) && Number(part) <= 255);
+    const openDevice = ip => window.location.assign(`http://${ip}:8091/control`);
+    // Pages 无法扫描 LAN；只对以前手动确认过的 IP 自动跳转，保留取消入口以便 IP 变化时修改。
+    if (lastIp && validIp(lastIp) && !new URLSearchParams(location.search).has('manual')) {
+      status.textContent = '正在连接上次使用的设备…';
+      manual.hidden = false;
+      const redirect = setTimeout(() => openDevice(lastIp), 1200);
+      const cancel = () => {
+        clearTimeout(redirect);
+        status.textContent = '';
+        manual.hidden = true;
+      };
+      manual.addEventListener('click', cancel);
+      address.addEventListener('input', cancel, { once: true });
+    }
     form.addEventListener('submit', event => {
       event.preventDefault();
       const ip = address.value.trim();
-      const parts = ip.split('.');
-      if (parts.length !== 4 || parts.some(part => !/^\d{1,3}$/.test(part) || Number(part) > 255)) {
+      if (!validIp(ip)) {
         status.textContent = '请输入设备屏幕上显示的 IPv4 地址';
         return;
       }
       status.textContent = '';
-      localStorage.setItem('unlockDeviceIp', ip);
+      try { localStorage.setItem('unlockDeviceIp', ip); } catch (_) {}
       // 顶层跳转让后续请求由设备自身的 HTTP 页面发起，避免 HTTPS 页面访问 HTTP 的混合内容限制。
-      window.location.assign(`http://${ip}:8091/control`);
+      openDevice(ip);
     });
   </script>
 </body>
