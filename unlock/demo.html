@@ -103,11 +103,6 @@
       }
     }
     function unlock() {
-      if (password.value !== 'demo1234') {
-        message('示例密码不正确', true);
-        actionLabel.textContent = '长按开锁';
-        return;
-      }
       busy = true;
       button.disabled = true;
       actionLabel.textContent = '正在开锁';
@@ -124,7 +119,13 @@
     }
     button.addEventListener('pointerdown', event => {
       if (busy || activePointer !== null || button.classList.contains('complete') || event.button !== 0) return;
+      // 密码在按下时判定；错误输入不启动长按，也不会在延迟后开锁。
+      if (password.value !== 'demo1234') {
+        message('示例密码不正确', true);
+        return;
+      }
       cancelHold();
+      message('');
       activePointer = event.pointerId;
       button.setPointerCapture(event.pointerId);
       button.classList.add('armed');
