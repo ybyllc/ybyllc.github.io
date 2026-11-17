@@ -22,9 +22,11 @@
     .reveal { display: flex; align-items: center; gap: 8px; margin-top: 14px; color: #53645b; font-size: 14px; font-weight: 400; }
     .reveal input { width: 18px; height: 18px; }
     .clear { margin-top: 12px; border: 0; background: none; color: #176a54; font-size: 14px; padding: 8px 0; }
-    .action { width: 100%; height: 76px; margin-top: 20px; border: 0; border-radius: 6px; background: #176a54; color: #fff; font-size: 20px; font-weight: 700; touch-action: none; user-select: none; -webkit-user-select: none; }
-    .action:active, .action.armed { background: #10523f; }
-    .action:disabled { background: #9aaba1; }
+    .action { position: relative; overflow: hidden; width: 100%; height: 76px; margin-top: 20px; border: 0; border-radius: 6px; background: #176a54; box-shadow: 0 4px 0 #0d4c3c; color: #fff; font-size: 20px; font-weight: 700; touch-action: none; user-select: none; -webkit-user-select: none; transition: transform .12s, box-shadow .12s; }
+    .action.armed { transform: translateY(3px); box-shadow: 0 1px 0 #0d4c3c; background: #10523f; }
+    .action:disabled { background: #9aaba1; box-shadow: none; transform: none; }
+    .action-label { position: relative; z-index: 1; }
+    .hold-progress { position: absolute; left: 0; bottom: 0; width: 0; height: 8px; background: #a5e9c5; }
     #status { min-height: 26px; margin: 18px 0 0; color: #53645b; font-size: 15px; }
     #status.error { color: #ab3830; }
     .back { display: inline-block; margin-top: 26px; color: #176a54; text-decoration: none; font-size: 15px; }
@@ -39,7 +41,7 @@
       <input id="password" type="password" inputmode="text" autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="24" placeholder="输入示例密码 demo1234">
       <label class="reveal"><input id="reveal" type="checkbox">显示密码</label>
       <button id="clear" class="clear" type="button">清除输入</button>
-      <button id="unlock" class="action" type="button">长按开锁</button>
+      <button id="unlock" class="action" type="button"><span id="action-label" class="action-label">长按开锁</span><span id="hold-progress" class="hold-progress" aria-hidden="true"></span></button>
       <p id="status" role="status" aria-live="polite"></p>
     </div>
     <a class="back" href="index.html?manual=1">返回设备连接</a>
@@ -47,8 +49,13 @@
   <script>
     const password = document.querySelector('#password');
     const button = document.querySelector('#unlock');
+    const actionLabel = document.querySelector('#action-label');
+    const holdProgress = document.querySelector('#hold-progress');
     const status = document.querySelector('#status');
-    let holdTimer;
+    const holdMs = 500;
+    let holdFrame = 0;
+    let holdStart = 0;
+    let activePointer = null;
     let busy = false;
     document.querySelector('#reveal').addEventListener('change', event => {
       password.type = event.target.checked ? 'text' : 'password';
@@ -62,9 +69,24 @@
       status.classList.toggle('error', error);
     }
     function cancelHold() {
-      clearTimeout(holdTimer);
-      holdTimer = undefined;
+      cancelAnimationFrame(holdFrame);
+      holdFrame = 0;
+      activePointer = null;
       button.classList.remove('armed');
+      holdProgress.style.width = '0%';
+      if (!busy) actionLabel.textContent = '长按开锁';
+    }
+    function updateHold(now) {
+      if (activePointer === null) return;
+      const percent = Math.min(100, Math.round((now - holdStart) / holdMs * 100));
+      holdProgress.style.width = `${percent}%`;
+      actionLabel.textContent = `确认中 ${percent}%`;
+      if (percent >= 100) {
+        cancelHold();
+        unlock();
+      } else {
+        holdFrame = requestAnimationFrame(updateHold);
+      }
     }
     function unlock() {
       if (password.value !== 'demo1234') {
@@ -73,6 +95,7 @@
       }
       busy = true;
       button.disabled = true;
+      actionLabel.textContent = '正在开锁';
       message('已接受请求 · 正在开锁');
       // 只更新演示状态；这里没有 fetch，也不会触发真实舵机。
       setTimeout(() => message('已开锁 · 等待回锁'), 1800);
@@ -81,17 +104,28 @@
         message('已回锁 · 演示完成');
         busy = false;
         button.disabled = false;
+        actionLabel.textContent = '长按开锁';
       }, 6400);
     }
     button.addEventListener('pointerdown', event => {
-      if (busy || event.button !== 0) return;
+      if (busy || activePointer !== null || event.button !== 0) return;
       cancelHold();
+      activePointer = event.pointerId;
       button.setPointerCapture(event.pointerId);
       button.classList.add('armed');
-      holdTimer = setTimeout(() => { cancelHold(); unlock(); }, 500);
+      holdStart = performance.now();
+      holdFrame = requestAnimationFrame(updateHold);
     });
     for (const name of ['pointerup', 'pointercancel', 'lostpointercapture'])
-      button.addEventListener(name, cancelHold);
+      button.addEventListener(name, event => {
+        if (event.pointerId === activePointer) cancelHold();
+      });
+    button.addEventListener('pointermove', event => {
+      if (event.pointerId !== activePointer) return;
+      const bounds = button.getBoundingClientRect();
+      if (event.clientX < bounds.left || event.clientX > bounds.right ||
+          event.clientY < bounds.top || event.clientY > bounds.bottom) cancelHold();
+    });
   </script>
 </body>
 </html>
