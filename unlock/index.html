@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="referrer" content="no-referrer">
+  <title>个人终端 · 开锁</title>
+  <style>
+    :root { color-scheme: light; font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif; }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: #f3f5f3; color: #182a24; }
+    main { width: min(100% - 40px, 420px); margin: max(36px, env(safe-area-inset-top)) auto 32px; }
+    header { border-bottom: 1px solid #d3ddd6; padding: 0 0 24px; }
+    .mark { width: 42px; height: 42px; display: grid; place-items: center; border-radius: 8px; background: #176a54; color: #fff; font-size: 24px; }
+    h1 { margin: 24px 0 6px; font-size: 25px; font-weight: 700; }
+    .subtitle { margin: 0; color: #61716a; font-size: 14px; }
+    form { padding-top: 32px; }
+    label { display: block; margin-bottom: 10px; font-weight: 600; font-size: 15px; }
+    input { width: 100%; height: 54px; border: 1px solid #9daea4; border-radius: 6px; background: #fff; padding: 0 16px; color: #182a24; font-size: 19px; letter-spacing: 0; }
+    input:focus { outline: 2px solid #176a54; outline-offset: 2px; }
+    button { width: 100%; height: 56px; margin-top: 18px; border: 0; border-radius: 6px; background: #176a54; color: #fff; font-size: 17px; font-weight: 600; }
+    button:active { background: #10523f; }
+    #status { min-height: 22px; margin: 16px 0 0; color: #ab3830; font-size: 14px; }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <div class="mark" aria-hidden="true">⌂</div>
+      <h1>个人终端</h1>
+      <p class="subtitle">局域网开锁</p>
+    </header>
+    <form id="connect">
+      <label for="address">设备 IP 地址</label>
+      <input id="address" name="address" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" placeholder="192.168.1.100" required>
+      <button type="submit">连接设备</button>
+      <p id="status" role="status" aria-live="polite"></p>
+    </form>
+  </main>
+  <script>
+    const form = document.querySelector('#connect');
+    const address = document.querySelector('#address');
+    const status = document.querySelector('#status');
+    address.value = localStorage.getItem('unlockDeviceIp') || '';
+    form.addEventListener('submit', event => {
+      event.preventDefault();
+      const ip = address.value.trim();
+      const parts = ip.split('.');
+      if (parts.length !== 4 || parts.some(part => !/^\d{1,3}$/.test(part) || Number(part) > 255)) {
+        status.textContent = '请输入设备屏幕上显示的 IPv4 地址';
+        return;
+      }
+      status.textContent = '';
+      localStorage.setItem('unlockDeviceIp', ip);
+      // 顶层跳转让后续请求由设备自身的 HTTP 页面发起，避免 HTTPS 页面访问 HTTP 的混合内容限制。
+      window.location.assign(`http://${ip}:8091/control`);
+    });
+  </script>
+</body>
+</html>
